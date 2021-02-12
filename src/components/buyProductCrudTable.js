@@ -122,7 +122,6 @@ class BuyProductCrudTable extends React.Component {
 
     confirmDeparameterize = () => {
         this.setState({displayDeparameterizeConfirmation: false})
-        this.setState({selectedProducts: null})
         if(this.state.selectedProducts){
             var listOfId = []
             Array.from(this.state.selectedProducts).forEach(selectedProduct => {
@@ -130,6 +129,8 @@ class BuyProductCrudTable extends React.Component {
             })
         }
         this.props.deparameterize(listOfId)
+        console.log('list of id', listOfId)
+        this.setState({selectedProducts: null})
     }
 
     viewProduct = async (buyProduct) => {
@@ -149,6 +150,10 @@ class BuyProductCrudTable extends React.Component {
             popUp.warningPopUp("O produto envolvido não consta no banco de dados")
         }
         
+    }
+
+    parametrized = (parametrized) => {
+        return this.state.selectedProducts.some(buyProduct => buyProduct.parametrized === parametrized)
     }
 
     render (){
@@ -174,7 +179,7 @@ class BuyProductCrudTable extends React.Component {
             {
                 label: 'Parametrizar',
                 icon: 'pi pi-link',
-                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 ,
+                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 || this.parametrized(true) ,
                 command: () => {
                     this.parametrize()
                 }
@@ -182,7 +187,8 @@ class BuyProductCrudTable extends React.Component {
             {
                 label: 'Desparametrizar',
                 icon: 'pi pi-undo',
-                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 || this.props.disableDeleteButton || !this.state.parametrizeButton,
+                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 || this.props.disableDeleteButton
+                || !this.state.parametrizeButton || this.parametrized(false),
                 command: () => {
                     this.deparameterize()
                 }

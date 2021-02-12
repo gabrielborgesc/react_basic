@@ -3,7 +3,6 @@ import { withRouter } from 'react-router-dom'
 
 import { AuthContext } from '../../main/authProvider'
 import ParametrizeProduct from './parameterizeProduct'
-import Parametrizing from './parameterizing'
 
 class Parametrize extends React.Component {
 

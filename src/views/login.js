@@ -2,11 +2,11 @@ import React from 'react'
 import Card from '../components/card'
 import FormGroup from '../components/form-group'
 import { withRouter } from 'react-router-dom'
-import * as popUp from '../components/toastr'
 import { AuthContext } from '../main/authProvider'
 import HandleErrorService from '../app/service/handleErrorService'
 import JwtService from '../app/service/jwtService'
 import { Button } from 'primereact/button'
+import * as popUp from '../components/toastr'
 
 class Login extends React.Component{
     
@@ -43,8 +43,10 @@ class Login extends React.Component{
             passwd: this.state.password
         }).then(response => {
             const data = response.data
-            this.context.beginSession(data)
-            this.props.history.push(`/home/${data.user.name}/${data.user.email}`)
+            var sessionInfo = data.sessionInfo
+            this.context.beginSession(sessionInfo)
+            this.props.history.push(`/home/${sessionInfo.user.name}/${sessionInfo.user.email}`)
+            if(data.unparametrizedBuyProducts) popUp.noticeParametrizePopUp()
         }).catch(error => {
             if(error.response){
             var data = error.response.data

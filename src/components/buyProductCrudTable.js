@@ -1,5 +1,4 @@
 import React from 'react'
-import { Toast } from 'primereact/toast'
 import { Button } from 'primereact/button'
 import { Toolbar } from 'primereact/toolbar'
 import { DataTable } from 'primereact/datatable'
@@ -36,7 +35,6 @@ class BuyProductCrudTable extends React.Component {
     }
     constructor(){
         super()
-        this.toast = React.createRef()
         this.dt = React.createRef()
         this.productService = new ProductService();
 
@@ -262,7 +260,6 @@ class BuyProductCrudTable extends React.Component {
 
         return (
             <div className="datatable-crud-demo">
-            <Toast ref={this.toast} />
 
             <div className="card">
                 <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>

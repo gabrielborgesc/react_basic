@@ -21,6 +21,7 @@ class TransactionByProduct extends React.Component {
         this.transactionService = new TransactionService();
         this.progressService = new ProgressService();
         this.generalServices = new GeneralServices();
+        this.testRef = React.createRef();
     }
 
     state = {
@@ -112,8 +113,6 @@ class TransactionByProduct extends React.Component {
         this.setState({loading: true})
         this.transactionService.getTransactions(
             {
-                beginDate: this.state.beginDate,
-                endDate: this.state.endDate,
                 nome: this.state.name,
                 modelo:  this.state.modelo,
                 descricaoProduto:  this.state.descricao,
@@ -290,6 +289,7 @@ class TransactionByProduct extends React.Component {
                     <>
                     <div className="row">
                     <div className="col-md-5" style={{marginLeft:'15px', maxWidth:'615px'}}>
+                        <div ref={this.testRef}/>
                     <label htmlFor="date">A partir de</label>
                         <InputMask id="beginDate"
                                 name="beginDate"
@@ -422,7 +422,7 @@ class TransactionByProduct extends React.Component {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-around'}}> */}
-                        <Button label={'Valor Total: ' + this.state.totalValue } className="p-button-info" />
+                        <Button label={'Valor Total: ' + this.state.totalValue } className="p-button-success" />
                         {/* <Button label={'Total de Compra: ' + this.state.totalBuyValue } className="p-button-warning"
                                 style = { {marginLeft: '8px'} }/>
                         <Button label={this.state.gainLabel + ': ' + this.state.gain } className={"p-button-" + this.state.gainClass}

@@ -1,18 +1,19 @@
 import React from 'react'
-import FormGroup from '../../components/form-group'
-import SelectMenu from '../../components/selectMenu'
+
+// import FormGroup from '../../components/form-group'
+// import SelectMenu from '../../components/selectMenu'
 
 import * as popUp from '../../components/toastr'
 
-import { Button } from 'primereact/button'
-import { addLocale } from 'primereact/api'
+// import { Button } from 'primereact/button'
+// import { addLocale } from 'primereact/api'
 
 import HandleErrorService from '../../app/service/handleErrorService'
 import TransactionByProductTable from './transactionByProductTable'
 import TransactionService from '../../app/service/transactionService'
 import ProgressService from '../../app/service/progressService'
 import GeneralServices from '../../app/service/generalServices'
-import { InputMask } from 'primereact/inputmask'
+// import { InputMask } from 'primereact/inputmask'
 
 class TransactionByProduct extends React.Component {
 
@@ -61,82 +62,81 @@ class TransactionByProduct extends React.Component {
         this.setState({currentLabel: this.state.productLabel})
     }
 
-    resetView = () => {
-        if(this.state.tipo) {
-            this.setState({inputTypeErrorClass: ""})
-            this.setState({errorTypeMessage:""})
-        }
-        if(this.state.situacao){
-            this.setState({inputSituationErrorClass: ""})
-            this.setState({errorSituationMessage:""})
-        }
-        if(this.state.beginDate){
-            this.setState({inputBeginDateErrorClass: ""})
-            this.setState({errorBeginDateMessage:""})
-        }
-        if(this.state.endDate){
-            this.setState({inputEndDateErrorClass: ""})
-            this.setState({errorEndDateMessage:""})
-        }
-        
-    }
+    // resetView = () => {
+    //     if(this.state.tipo) {
+    //         this.setState({inputTypeErrorClass: ""})
+    //         this.setState({errorTypeMessage:""})
+    //     }
+    //     if(this.state.situacao){
+    //         this.setState({inputSituationErrorClass: ""})
+    //         this.setState({errorSituationMessage:""})
+    //     }
+    //     if(this.state.beginDate){
+    //         this.setState({inputBeginDateErrorClass: ""})
+    //         this.setState({errorBeginDateMessage:""})
+    //     }
+    //     if(this.state.endDate){
+    //         this.setState({inputEndDateErrorClass: ""})
+    //         this.setState({errorEndDateMessage:""})
+    //     }
+    // }
 
-    checkFilter = () => {
-        var check = true
-        if(!this.state.tipo){
-            this.setState({inputTypeErrorClass: "is-invalid"})
-            this.setState({errorTypeMessage:"Selecione o tipo"})
-            check = false
-        }
-        if(!this.state.situacao){
-            this.setState({inputSituationErrorClass: "is-invalid"})
-            this.setState({errorSituationMessage:"Selecione a situação"})
-            check = false
-        }
-        // if(!this.state.beginDate){
-        //     this.setState({inputBeginDateErrorClass: "p-invalid"})
-        //     this.setState({errorBeginDateMessage: "Informe a data mínima"})
-        //     check=false
-        // }
-        // if(!this.state.endDate){
-        //     this.setState({inputEndDateErrorClass: "p-invalid"})
-        //     this.setState({errorEndDateMessage: "Informe a data mínima"})
-        //     check=false
-        // }
+    // checkFilter = () => {
+    //     var check = true
+    //     if(!this.state.tipo){
+    //         this.setState({inputTypeErrorClass: "is-invalid"})
+    //         this.setState({errorTypeMessage:"Selecione o tipo"})
+    //         check = false
+    //     }
+    //     if(!this.state.situacao){
+    //         this.setState({inputSituationErrorClass: "is-invalid"})
+    //         this.setState({errorSituationMessage:"Selecione a situação"})
+    //         check = false
+    //     }
+    //     // if(!this.state.beginDate){
+    //     //     this.setState({inputBeginDateErrorClass: "p-invalid"})
+    //     //     this.setState({errorBeginDateMessage: "Informe a data mínima"})
+    //     //     check=false
+    //     // }
+    //     // if(!this.state.endDate){
+    //     //     this.setState({inputEndDateErrorClass: "p-invalid"})
+    //     //     this.setState({errorEndDateMessage: "Informe a data mínima"})
+    //     //     check=false
+    //     // }
 
-        return check
-    }
+    //     return check
+    // }
 
-    get = (showInfoPopUp) =>{
-        this.resetView()
-        if(!this.checkFilter()) return
-        this.setState({loading: true})
-        this.transactionService.getTransactions(
-            {
-                nome: this.state.name,
-                modelo:  this.state.modelo,
-                descricaoProduto:  this.state.descricao,
-                tipo:  this.state.tipo,
-                situacao:  this.state.situacao,
-                numero: this.state.numero,
-                serie: this.state.serie
-            }, this.state.beginDate, this.state.endDate
-        )
-        .then(response => {
-            this.setState({transactionList: response.data})
-            // this.filter(showInfoPopUp)
-            this.setState({filteredList: response.data})
-            this.setState({loading: false})
-            this.setState({disableDeleteButton: false})
-            this.calculateTotalValue(response.data)
-            if(!response.data.length && showInfoPopUp){
-                popUp.infoPopUp("Nenhuma movimentação encontrada com os dados informados")
-            }          
-        }).catch(error => {
-            HandleErrorService.handleError(this.props.push, error)
-            this.setState({loading: false})
-        })     
-    }
+    // get = (showInfoPopUp) =>{
+    //     this.resetView()
+    //     if(!this.checkFilter()) return
+    //     this.setState({loading: true})
+    //     this.transactionService.getTransactions(
+    //         {
+    //             nome: this.state.name,
+    //             modelo:  this.state.modelo,
+    //             descricaoProduto:  this.state.descricao,
+    //             tipo:  this.state.tipo,
+    //             situacao:  this.state.situacao,
+    //             numero: this.state.numero,
+    //             serie: this.state.serie
+    //         }, this.state.beginDate, this.state.endDate
+    //     )
+    //     .then(response => {
+    //         this.setState({transactionList: response.data})
+    //         // this.filter(showInfoPopUp)
+    //         this.setState({filteredList: response.data})
+    //         this.setState({loading: false})
+    //         this.setState({disableDeleteButton: false})
+    //         this.calculateTotalValue(response.data)
+    //         if(!response.data.length && showInfoPopUp){
+    //             popUp.infoPopUp("Nenhuma movimentação encontrada com os dados informados")
+    //         }          
+    //     }).catch(error => {
+    //         HandleErrorService.handleError(this.props.push, error)
+    //         this.setState({loading: false})
+    //     })     
+    // }
 
     // calculateTotalValue = transactions => {
     //     var totalSaleValue = 0;
@@ -163,19 +163,19 @@ class TransactionByProduct extends React.Component {
     //     this.setState({gain})
     // }
 
-    calculateTotalValue = transactions => {
-        var totalValue = 0;
-        transactions.forEach(transaction => {
-            totalValue += transaction.valor
-        })
-        this.setState({totalValue: GeneralServices.valueBodyTemplate(totalValue)})
-    }
+    // calculateTotalValue = transactions => {
+    //     var totalValue = 0;
+    //     transactions.forEach(transaction => {
+    //         totalValue += transaction.valor
+    //     })
+    //     this.setState({totalValue: GeneralServices.valueBodyTemplate(totalValue)})
+    // }
 
-    handleChange = async (event) => {
-        const value = event.target.value
-        const name = event.target.name
-        await this.setState({ [name]: value })
-    }
+    // handleChange = async (event) => {
+    //     const value = event.target.value
+    //     const name = event.target.name
+    //     await this.setState({ [name]: value })
+    // }
 
     // filter = async (showInfoPopUp) => {
     //     this.setState({loading: true})
@@ -247,7 +247,9 @@ class TransactionByProduct extends React.Component {
             var progress = response.data.progress
             if(parseInt(progress,10) === 100){
                 popUp.successPopUp("Movimentação(ões) deletada(s) com sucesso")
-                this.get()
+                this.setState({loading: false})
+                this.setState({disableDeleteButton: false})
+                this.props.get()
                 this.progressService.deleteProgress(progressKey)
             } else{ // progress !==100
                 await this.generalServices.sleep(1*1000)
@@ -261,6 +263,8 @@ class TransactionByProduct extends React.Component {
                 this.getProgress(progressKey)
             } else{
                 this.setState({getProgressError: 0})
+                this.setState({loading: false})
+                this.setState({disableDeleteButton: false})
                 this.get();
                 this.progressService.deleteProgress(progressKey)
 
@@ -268,26 +272,22 @@ class TransactionByProduct extends React.Component {
         })
     }
 
-    changeLabel = (label) => {
-        this.setState({currentLabel: label})
-    }
-
     render() {
-        addLocale('pt-br', {
-            firstDayOfWeek: 0,
-            dayNames: ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'],
-            dayNamesShort: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
-            dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
-            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-            monthNamesShort: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
-            today: 'Hoje',
-            clear: 'Claro'
-        })
-        const typeList = this.transactionService.getTypeList()
-        const situationList = this.transactionService.getSituationList()
+        // addLocale('pt-br', {
+        //     firstDayOfWeek: 0,
+        //     dayNames: ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'],
+        //     dayNamesShort: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
+        //     dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+        //     monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+        //     monthNamesShort: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
+        //     today: 'Hoje',
+        //     clear: 'Claro'
+        // })
+        // const typeList = this.transactionService.getTypeList()
+        // const situationList = this.transactionService.getSituationList()
         return (
                     <>
-                    <div className="row">
+                    {/* <div className="row">
                     <div className="col-md-5" style={{marginLeft:'15px', maxWidth:'615px'}}>
                         <div ref={this.testRef}/>
                     <label htmlFor="date">A partir de</label>
@@ -311,9 +311,9 @@ class TransactionByProduct extends React.Component {
                                 onChange={this.handleChange} />
                         <small id="username-help" className="p-error">{this.state.errorEndDateMessage}</small>
                         </div>
-                        </div>
-                    < br/>
-                    <div className = "col-md-12">
+                        </div> */}
+                    {/* < br/>
+                    <div className = "col-md-12"> */}
                     {/* <div className="row">
                     <div className = "col-md-5">
                         <FormGroup label = "Nome Forn/Cliente " htmlFor = "InputName">
@@ -337,7 +337,7 @@ class TransactionByProduct extends React.Component {
                         </FormGroup>
                         </div>
                         </div> */}
-                        <div className = "row">
+                        {/* <div className = "row">
                         <div className = "col-md-5">
                         <FormGroup label = "Tipo " htmlFor = "InputType">
                             <SelectMenu className={"form-control " + this.state.inputTypeErrorClass}
@@ -358,7 +358,7 @@ class TransactionByProduct extends React.Component {
                             <div className="invalid-feedback">{this.state.errorSituationMessage}</div>
                         </FormGroup>
                         </div>
-                        </div>
+                        </div> */}
                         {/* <div className = "row">
                         <div className = "col-md-5">
                         <FormGroup label = "Número da nota " htmlFor = "InputNFeNumber">
@@ -399,7 +399,7 @@ class TransactionByProduct extends React.Component {
                         </FormGroup>
                         </div>
                         </div> */}
-                        <Button 
+                        {/* <Button 
                             label="Buscar"
                             icon="pi pi-search"
                             onClick = {e => {this.get(true)} }
@@ -411,31 +411,32 @@ class TransactionByProduct extends React.Component {
                             icon="pi pi-save"
                             style={ {maxHeight: '35px', marginLeft: '8px'} }
                             />
-                        </a>
-                    </div>
+                        </a> */}
+                    {/* </div> */}
                     
                     <div className="bs-docs-section" >
-                    <div className = "card mb-3">
-                    <div className = "card-header">
+                    {/* <div className = "card mb-3">
+                    <div className = "card-header"> */}
                     {/* <div
                     style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-around'}}> */}
-                        <Button label={'Valor Total: ' + this.state.totalValue } className="p-button-success" />
+                        {/* <Button label={'Valor Total: ' + this.state.totalValue } className="p-button-success" /> */}
                         {/* <Button label={'Total de Compra: ' + this.state.totalBuyValue } className="p-button-warning"
                                 style = { {marginLeft: '8px'} }/>
                         <Button label={this.state.gainLabel + ': ' + this.state.gain } className={"p-button-" + this.state.gainClass}
                                 style = { {marginLeft: '8px'} } /> */}
                     {/* </div> */}
-                    </div>
-                    </div>
-                        <TransactionByProductTable list = {this.state.filteredList}
-                                   deleteButton = {this.askForDeleteEntry}
+                    {/* </div>
+                    </div> */}
+                        <TransactionByProductTable 
+                                //    list = {this.state.filteredList}
+                                   list = {this.props.list}
                                    deleteMultiple = {this.deleteMultipleTransactions}
                                    search = {this.search}
-                                   loading = {this.state.loading}
-                                   disableDeleteButton = {this.state.disableDeleteButton}
+                                   loading = {this.state.loading || this.props.loading}
+                                   disableDeleteButton = {this.state.disableDeleteButton || this.props.disableDeleteButton}
                                    push = {this.props.push} />
                     </div>
                     </>

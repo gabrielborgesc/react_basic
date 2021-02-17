@@ -13,7 +13,7 @@ import ProductDialog from '../../components/product/productDialog'
 import TableFilters from '../../components/tableFilters'
 import TransactionService from '../../app/service/transactionService'
 
-class TransactionByProductTable extends React.Component {
+class TransactionByNFTable extends React.Component {
 
     state = {
         codigo: null,
@@ -21,10 +21,8 @@ class TransactionByProductTable extends React.Component {
         ncm: null,
         tipo: '',
         unidadeComercializada: '',
-        proporcao: '',
         selectedTransactions: null,
         productDialog: false,
-        buyProductDialog: false,
         displayConfirmation: false,
         dateView: "timestamp",
         productDialogHeader: '',
@@ -44,6 +42,7 @@ class TransactionByProductTable extends React.Component {
         selectedModels: null,
         unitField: 'productInfo.unidadeComercializada',
         selectedUnits: null,
+        expandedRows: []
     }
     constructor(){
         super()
@@ -67,7 +66,6 @@ class TransactionByProductTable extends React.Component {
             this.setState({tipo: product.tipo})
             this.setState({unidadeComercializada: product.unidadeComercializada})
             this.setState({productDialogHeader: 'Produto'})
-            this.setState({buyProductDialog: false})
             this.setState({productDialog: true})
         } else{
             var buyProduct = transaction.buyProduct
@@ -79,9 +77,7 @@ class TransactionByProductTable extends React.Component {
                     this.setState({ncm: parametrizedProduct.ncm})
                     this.setState({tipo: parametrizedProduct.tipo})
                     this.setState({unidadeComercializada: parametrizedProduct.unidadeComercializada})
-                    this.setState({proporcao: buyProduct.proportion})
                     this.setState({productDialogHeader: 'Parametrizado com: '})
-                    this.setState({buyProductDialog: true})
                     this.setState({productDialog: true})
                 }
             } else{
@@ -178,39 +174,77 @@ class TransactionByProductTable extends React.Component {
                 </div>
             );
         }
-
-        //Código filter
-        const codeFilterElement = this.tableFilters.renderCodigoFilter(this.state.selectedCodes, this.transactionService.getCodeList,
-            this.props.list, "selectedCodes", this.onFilterChange, this.state.codigoField)
-        
-        //Descrição Filter
-        const descriptionFilterElement = this.tableFilters.renderDescriptionFilter(this.state.selectedDescriptions,
-            this.transactionService.getDescriptionList, this.props.list, "selectedDescriptions",
-            this.onFilterChange, this.state.descricaoField, '120px')
-
-        //NCM Filter
-        const NCMFilterElement = this.tableFilters.renderNCMFilter(this.state.selectedNCM, this.transactionService.getNCMList,
-            this.props.list, "selectedNCM", this.onFilterChange, this.state.NCMField)
-        
-        //CFOP Filter
-        const cfopFilterElement = this.tableFilters.renderCfopFilter(this.state.selectedCfops, this.transactionService.getCfopList,
-            this.props.list, "selectedCfops", this.onFilterChange, this.state.cfopField)
         
         //Numero Filter
         const numberFilterElement = this.tableFilters.renderNumeroFilter(this.state.selectedNumbers, this.transactionService.getNumberList,
             this.props.list, "selectedNumbers", this.onFilterChange, this.state.numberField)
 
-        //Serie Filter
-        const serieFilterElement = this.tableFilters.renderSerieFilter(this.state.selectedSeries, this.transactionService.getSerieList,
-            this.props.list, "selectedSeries", this.onFilterChange, this.state.serieField)
-        
         //Modelo Filter
         const modelFilterElement = this.tableFilters.renderModelFilter(this.state.selectedModels, this.transactionService.getModelList,
             this.props.list, "selectedModels", this.onFilterChange, this.state.modelField)
 
-        //Unidade Filter      
-        const unitFilterElement = this.tableFilters.renderUnitFilter(this.state.selectedUnits, this.transactionService.getUnitList,
-            this.props.list, "selectedUnits", this.onFilterChange, this.state.unitField)
+        const rowExpansionTemplate = rowData => {
+            return(
+                <div className="orders-subtable">
+                <h5>Itens da nota {rowData.numero}</h5>
+                <DataTable ref={this.dt} value={rowData.transactions}
+                            className="p-datatable-sm"
+                            scrollable
+                            scrollHeight="300px"
+                    dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    currentPageReportTemplate="Mostrando de {first} ao {last} de {totalRecords} movimentações"
+                    >
+
+                    <Column field={this.state.codigoField} header="Código" sortable style ={ {width: '140px'} }
+                    // filter filterElement={codeFilterElement}
+                     />
+
+                    <Column field={this.state.descricaoField} header="Descrição do Produto" sortable style ={ {width: '140px'} } 
+                    // filter filterElement={descriptionFilterElement}
+                    />
+
+                    <Column field={this.state.NCMField} header="NCM" sortable style ={ {width: '140px'} } body={rowData => GeneralServices.adjustNCM(rowData.productInfo.ncm)}
+                    // filter filterElement={NCMFilterElement}
+                    />
+
+                    <Column field={this.state.cfopField} header="CFOP" sortable style ={ {width: '140px'} } 
+                    // filter filterElement={cfopFilterElement}
+                     />
+
+                    <Column field = "valor" header="Valor Total" body={transaction => GeneralServices.valueBodyTemplate(transaction.valor)} sortable style ={ {width: '140px'} }></Column>
+                    
+                    <Column field={this.state.dateView} header="Data de Emissão" body={rowData => rowData.dhEmi.substring(0, 21)} sortable style ={ {width: '140px'} }></Column>
+                    
+                    <Column field={this.state.numberField} header="Número" sortable style ={ {width: '140px'} } 
+                    // filter filterElement={numberFilterElement}
+                    />
+
+                    <Column field="nomeFornecedorOuCliente" header="Nome Forn/Cliente" sortable style ={ {width: '200px'} }></Column>
+                    
+                    <Column field={this.state.serieField} header="Série" sortable style ={ {width: '100px'} } 
+                    // filter filterElement={serieFilterElement}
+                     />
+                    
+                    <Column field={this.state.modelField} header="Modelo" sortable style ={ {width: '120px'} } 
+                    // filter filterElement={modelFilterElement}
+                     />
+
+                    <Column field="tipo" header="Tipo" sortable style ={ {width: '120px'} }></Column>
+                    
+                    <Column field = "valorUnitario" header="Valor Unitário" body={transaction => GeneralServices.valueBodyTemplate(transaction.valorUnitario)} sortable style ={ {width: '140px'} }></Column>
+                    
+                    <Column field="quantidade" header="Quantidade" sortable style ={ {width: '140px'} }></Column>
+                    
+                    <Column field={this.state.unitField} header="Unidade" sortable style ={ {width: '140px'} } 
+                    // filter filterElement={unitFilterElement}
+                    />
+
+                    <Column body={actionBodyTemplate} style ={ {width: '160px'} }></Column>
+                </DataTable>
+                </div>
+            )
+        }
 
         return (
             <div className="datatable-crud-demo">
@@ -226,50 +260,31 @@ class TransactionByProductTable extends React.Component {
                             scrollable
                             scrollHeight="500px"
                             loading={this.props.loading}
-                    dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                            expandableRows={true}
+                            expandedRows = {this.state.expandedRows}
+                            onRowToggle={(e) => this.setState({expandedRows: e.data})}
+                            rowExpansionTemplate={rowExpansionTemplate}
+                    dataKey="numero" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Mostrando de {first} ao {last} de {totalRecords} movimentações"
                     >
 
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
 
-                    <Column field={this.state.codigoField} header="Código" sortable style ={ {width: '140px'} }
-                    filter filterElement={codeFilterElement} />
+                    <Column expander style={{ width: '3em' }} />
 
-                    <Column field={this.state.descricaoField} header="Descrição do Produto" sortable style ={ {width: '140px'} } 
-                    filter filterElement={descriptionFilterElement}/>
-
-                    <Column field={this.state.NCMField} header="NCM" sortable style ={ {width: '140px'} } body={rowData => GeneralServices.adjustNCM(rowData.productInfo.ncm)}
-                    filter filterElement={NCMFilterElement}/>
-
-                    <Column field={this.state.cfopField} header="CFOP" sortable style ={ {width: '140px'} } 
-                    filter filterElement={cfopFilterElement} />
-
-                    <Column field = "valor" header="Valor Total" body={transaction => GeneralServices.valueBodyTemplate(transaction.valor)} sortable style ={ {width: '140px'} }></Column>
-                    <Column field={this.state.dateView} header="Data de Emissão" body={rowData => rowData.dhEmi.substring(0, 21)} sortable style ={ {width: '140px'} }></Column>
-                    
                     <Column field={this.state.numberField} header="Número" sortable style ={ {width: '140px'} } 
                     filter filterElement={numberFilterElement}/>
 
-                    <Column field="nomeFornecedorOuCliente" header="Nome Forn/Cliente" sortable style ={ {width: '200px'} }></Column>
+                    <Column field = "valorTotal" header="Valor Total" body={NF => GeneralServices.valueBodyTemplate(NF.valorTotal)} sortable style ={ {width: '140px'} }></Column>
                     
-                    <Column field={this.state.serieField} header="Série" sortable style ={ {width: '100px'} } 
-                    filter filterElement={serieFilterElement} />
-                    
+                    <Column field={this.state.dateView} header="Data de Emissão" body={rowData => rowData.dhEmi.substring(0, 21)} sortable style ={ {width: '140px'} }></Column>
+
                     <Column field={this.state.modelField} header="Modelo" sortable style ={ {width: '120px'} } 
                     filter filterElement={modelFilterElement} />
 
                     <Column field="tipo" header="Tipo" sortable style ={ {width: '120px'} }></Column>
-                    {/* <Column field="situacao" header="Situação" sortable style ={ {width: '180px'} }></Column> */}
                     
-                    <Column field = "valorUnitario" header="Valor Unitário" body={transaction => GeneralServices.valueBodyTemplate(transaction.valorUnitario)} sortable style ={ {width: '140px'} }></Column>
-                    
-                    <Column field="quantidade" header="Quantidade" sortable style ={ {width: '140px'} }></Column>
-                    
-                    <Column field={this.state.unitField} header="Unidade" sortable style ={ {width: '140px'} } 
-                    filter filterElement={unitFilterElement}/>
-
-                    <Column body={actionBodyTemplate} style ={ {width: '160px'} }></Column>
                 </DataTable>
             </div>
 
@@ -277,7 +292,6 @@ class TransactionByProductTable extends React.Component {
                             hideDialog={this.hideDialog}
                             visible={this.state.productDialog}
                             header={this.state.productDialogHeader}
-                            buyProduct={this.state.buyProductDialog}
                             state={this.state}
                             disabled={true}
                              />
@@ -300,4 +314,4 @@ class TransactionByProductTable extends React.Component {
 
 }  
 
-export default TransactionByProductTable
+export default TransactionByNFTable

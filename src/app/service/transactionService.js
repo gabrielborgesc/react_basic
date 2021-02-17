@@ -119,7 +119,7 @@ class TransactionService extends ApiService {
         var CfopList = []
         list.forEach(transaction => {
             var cfop = transaction.productInfo.cfop
-            var cfopLabel = cfop.toString()
+            var cfopLabel = cfop ? cfop.toString() : null
             if(!CfopList.some( element => element.value === cfop )){
                 var object = {label: cfopLabel, value: cfop}
                 CfopList.push(object)

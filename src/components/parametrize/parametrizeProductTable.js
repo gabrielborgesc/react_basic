@@ -35,6 +35,10 @@ class ParametrizeProductTable extends React.Component {
     }
 
     handleSelectionChange = async (e) => {
+        if(e.value.length > 1 ) {
+            popUp.warningPopUp("Apenas um produto pode ser selecionado")
+            return
+        }
         await this.setState({selectedProducts: e.value})
        if(!this.state.selectedProducts || this.state.selectedProducts.length === 0){
            this.props.search()
@@ -58,7 +62,6 @@ class ParametrizeProductTable extends React.Component {
     }
 
     parametrize = () => {
-        console.log('proportion', this.state.proportion)
         if(!this.state.proportion){
             this.setState({inputProportionErrorClass: 'is-invalid'})
             this.setState({errorProportionMessage: 'Informe a proporção'})
@@ -73,6 +76,13 @@ class ParametrizeProductTable extends React.Component {
         const value = event.target.value
         const name = event.target.name
         this.setState({ [name]: value })
+    }
+
+    handleKeypress = e => {
+        //it triggers by pressing the enter key
+      if (e.key === "Enter") {
+        this.parametrize();
+      }
     }
 
     render (){
@@ -146,6 +156,7 @@ class ParametrizeProductTable extends React.Component {
                             value = {this.state.proportion}
                             name="proportion"
                             onChange={this.handleChange}
+                            onKeyPress={this.handleKeypress}
                             id="inputProportion"
                             placeholder="Digite a conversão"
                             disabled={this.props.disabled} 

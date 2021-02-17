@@ -1,5 +1,4 @@
 import React from 'react'
-import { Toast } from 'primereact/toast'
 import { Button } from 'primereact/button'
 import { Toolbar } from 'primereact/toolbar'
 import { DataTable } from 'primereact/datatable'
@@ -36,7 +35,6 @@ class BuyProductCrudTable extends React.Component {
     }
     constructor(){
         super()
-        this.toast = React.createRef()
         this.dt = React.createRef()
         this.productService = new ProductService();
 
@@ -122,7 +120,6 @@ class BuyProductCrudTable extends React.Component {
 
     confirmDeparameterize = () => {
         this.setState({displayDeparameterizeConfirmation: false})
-        this.setState({selectedProducts: null})
         if(this.state.selectedProducts){
             var listOfId = []
             Array.from(this.state.selectedProducts).forEach(selectedProduct => {
@@ -130,6 +127,8 @@ class BuyProductCrudTable extends React.Component {
             })
         }
         this.props.deparameterize(listOfId)
+        console.log('list of id', listOfId)
+        this.setState({selectedProducts: null})
     }
 
     viewProduct = async (buyProduct) => {
@@ -149,6 +148,10 @@ class BuyProductCrudTable extends React.Component {
             popUp.warningPopUp("O produto envolvido não consta no banco de dados")
         }
         
+    }
+
+    parametrized = (parametrized) => {
+        return this.state.selectedProducts.some(buyProduct => buyProduct.parametrized === parametrized)
     }
 
     render (){
@@ -174,7 +177,7 @@ class BuyProductCrudTable extends React.Component {
             {
                 label: 'Parametrizar',
                 icon: 'pi pi-link',
-                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 ,
+                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 || this.parametrized(true) ,
                 command: () => {
                     this.parametrize()
                 }
@@ -182,7 +185,8 @@ class BuyProductCrudTable extends React.Component {
             {
                 label: 'Desparametrizar',
                 icon: 'pi pi-undo',
-                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 || this.props.disableDeleteButton || !this.state.parametrizeButton,
+                disabled: !this.state.selectedProducts || this.state.selectedProducts.length === 0 || this.props.disableDeleteButton
+                || !this.state.parametrizeButton || this.parametrized(false),
                 command: () => {
                     this.deparameterize()
                 }
@@ -256,7 +260,6 @@ class BuyProductCrudTable extends React.Component {
 
         return (
             <div className="datatable-crud-demo">
-            <Toast ref={this.toast} />
 
             <div className="card">
                 <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>

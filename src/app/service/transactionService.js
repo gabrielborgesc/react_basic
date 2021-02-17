@@ -188,6 +188,10 @@ class TransactionService extends ApiService {
         return this.post(`/deleteMultipleTransactions`, object)
     }
 
+    deleteMultipleNFs(object){
+        return this.post(`/deleteMultipleNFs`, object)
+    }
+
     
 }
 

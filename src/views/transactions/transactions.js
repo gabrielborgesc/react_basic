@@ -14,12 +14,15 @@ import GeneralServices from '../../app/service/generalServices'
 import HandleErrorService from '../../app/service/handleErrorService'
 import TransactionByProductTable from './transactionByProductTable'
 import TransactionByNFTable from './transactionByNFTable'
+import ProgressService from '../../app/service/progressService'
 
 class Transactions extends React.Component {
 
     constructor(){
         super();
         this.transactionService = new TransactionService();
+        this.generalServices = new GeneralServices();
+        this.progressService = new ProgressService();
     }
 
     state = {
@@ -41,6 +44,8 @@ class Transactions extends React.Component {
         inputEndDateErrorClass: null,
         loading: false,
         totalValue: GeneralServices.valueBodyTemplate(0),
+        getTransactionDeleteProgressError: 0,
+        getNFDeleteProgressError: 0
     }
 
     componentDidMount(){
@@ -171,7 +176,8 @@ class Transactions extends React.Component {
             const timestamp = Date.now()
             var object = {
                 listOfTransactionsId: listOfId,
-                key: timestamp
+                key: timestamp,
+                description: 'Delete transactions by product'
             }
             this.transactionService.deleteMultipleTransactions(object)
             // .then( response => {
@@ -183,31 +189,83 @@ class Transactions extends React.Component {
             //     this.setState({disableDeleteButton: false})
             // })
             
-            this.getProgress(timestamp)
+            this.getTransactionDeleteProgress(timestamp)
         }
     }
 
-    getProgress = async progressKey => {
+    getTransactionDeleteProgress = async progressKey => {
         await this.generalServices.sleep(1*1000)
         this.progressService.getProgress(progressKey)
         .then(async response => {
             var progress = response.data.progress
             if(parseInt(progress,10) === 100){
                 popUp.successPopUp("Movimentação(ões) deletada(s) com sucesso")
-                this.props.get()
+                this.get()
                 this.progressService.deleteProgress(progressKey)
             } else{ // progress !==100
                 await this.generalServices.sleep(1*1000)
-                this.getProgress(progressKey)
+                this.getTransactionDeleteProgress(progressKey)
             }
         }).catch(async error => {
             HandleErrorService.handleError(this.props.history.push, error)
             await this.generalServices.sleep(1*1000)
-            this.setState({getProgressError: this.state.getProgressError+1})
-            if(this.state.getProgressError<5){
-                this.getProgress(progressKey)
+            this.setState({getTransactionDeleteProgressError: this.state.getTransactionDeleteProgressError+1})
+            if(this.state.getTransactionDeleteProgressError<5){
+                this.getTransactionDeleteProgress(progressKey)
             } else{
-                this.setState({getProgressError: 0})
+                this.setState({getTransactionDeleteProgressError: 0})
+                this.get()
+                this.progressService.deleteProgress(progressKey)
+
+            }
+        })
+    }
+
+    deleteMultipleNFs = (listOfNFNumbers) => {
+        if(listOfNFNumbers){
+            this.setState({loading: true})
+            this.setState({disableDeleteButton: true})
+            const timestamp = Date.now()
+            var object = {
+                listOfNFNumbers: listOfNFNumbers,
+                key: timestamp,
+                description: 'Delete transactions by NF'
+            }
+            this.transactionService.deleteMultipleNFs(object)
+            // .then( response => {
+            //     popUp.successPopUp("Nota(s) deletada(s) com sucesso")
+            //     this.get()
+            // }).catch(error => {
+            //     HandleErrorService.handleError(this.props.history.push, error)
+            //     this.setState({loading: false})
+            //     this.setState({disableDeleteButton: false})
+            // })
+            
+            this.getNFDeleteProgress(timestamp)
+        }
+    }
+
+    getNFDeleteProgress = async progressKey => {
+        await this.generalServices.sleep(1*1000)
+        this.progressService.getProgress(progressKey)
+        .then(async response => {
+            var progress = response.data.progress
+            if(parseInt(progress,10) === 100){
+                popUp.successPopUp("Nota(s) deletada(s) com sucesso")
+                this.get()
+                this.progressService.deleteProgress(progressKey)
+            } else{ // progress !==100
+                await this.generalServices.sleep(1*1000)
+                this.getNFDeleteProgress(progressKey)
+            }
+        }).catch(async error => {
+            HandleErrorService.handleError(this.props.history.push, error)
+            await this.generalServices.sleep(1*1000)
+            this.setState({getNFDeleteProgressError: this.state.getNFDeleteProgressError+1})
+            if(this.state.getNFDeleteProgressError<5){
+                this.getNFDeleteProgress(progressKey)
+            } else{
+                this.setState({getNFDeleteProgressError: 0})
                 this.get()
                 this.progressService.deleteProgress(progressKey)
 
@@ -325,7 +383,7 @@ class Transactions extends React.Component {
                        (
                             <TransactionByNFTable 
                                 list = {this.groupByNF()}
-                                deleteMultiple = {this.deleteMultipleTransactions}
+                                deleteMultiple = {this.deleteMultipleNFs}
                                 loading = {this.state.loading}
                                 disableDeleteButton = {this.state.disableDeleteButton}
                             />

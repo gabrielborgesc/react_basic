@@ -21,9 +21,9 @@ class TransactionByNFTable extends React.Component {
         ncm: null,
         tipo: '',
         unidadeComercializada: '',
-        selectedTransactions: null,
+        selectedNFs: null,
         productDialog: false,
-        displayConfirmation: false,
+        displayDeleteConfirmation: false,
         dateView: "timestamp",
         productDialogHeader: '',
         codigoField: 'productInfo.codigo',
@@ -98,23 +98,23 @@ class TransactionByNFTable extends React.Component {
     }
 
     delete = () => {
-        if(this.state.selectedTransactions){
-            this.setState({displayConfirmation: true})
+        if(this.state.selectedNFs){
+            this.setState({displayDeleteConfirmation: true})
         } else {
-            popUp.warningPopUp("Nenhum produto foi selecionado para exclusão")
+            popUp.warningPopUp("Nenhuma nota foi selecionada para exclusão")
         }
     }
 
     confirmDelete = () => {
-        this.setState({displayConfirmation: false})
-        this.setState({selectedTransactions: null})
-        if(this.state.selectedTransactions){
-            var listOfId = []
-            Array.from(this.state.selectedTransactions).forEach(selectedTransaction => {
-                listOfId.push(selectedTransaction.id)
+        this.setState({displayDeleteConfirmation: false})
+        if(this.state.selectedNFs){
+            var listOfNFNumbers = []
+            Array.from(this.state.selectedNFs).forEach(selectedNF => {
+                listOfNFNumbers.push(selectedNF.numero)
             })
         }
-        this.props.deleteMultiple(listOfId)
+        this.setState({selectedNFs: null})
+        this.props.deleteMultiple(listOfNFNumbers)
     }
 
     onFilterChange = (event, filterField) => {
@@ -130,7 +130,8 @@ class TransactionByNFTable extends React.Component {
                 <React.Fragment>
                     <Button label="Deletar" icon="pi pi-trash" className="p-button-danger"
                             onClick={this.delete}
-                            disabled = {this.props.disableDeleteButton}
+                            disabled = {this.props.disableDeleteButton || !this.state.selectedNFs
+                                || this.state.selectedNFs.length === 0}
                             />
                 </React.Fragment>
             )
@@ -169,7 +170,7 @@ class TransactionByNFTable extends React.Component {
                 <div>
                     <Button label="Confirmar" icon="pi pi-check"
                             onClick={this.confirmDelete} autoFocus />
-                    <Button label="Cancelar" icon="pi pi-times" onClick={() => this.setState({displayConfirmation: false})}
+                    <Button label="Cancelar" icon="pi pi-times" onClick={() => this.setState({displayDeleteConfirmation: false})}
                             className="p-button-text" />
                 </div>
             );
@@ -255,8 +256,8 @@ class TransactionByNFTable extends React.Component {
 
                 <DataTable ref={this.dt} value={this.props.list}
                             className="p-datatable-sm"
-                            selection={this.state.selectedTransactions}
-                            onSelectionChange={(e) => this.setState({selectedTransactions: e.value})}
+                            selection={this.state.selectedNFs}
+                            onSelectionChange={(e) => this.setState({selectedNFs: e.value})}
                             scrollable
                             scrollHeight="500px"
                             loading={this.props.loading}
@@ -297,11 +298,11 @@ class TransactionByNFTable extends React.Component {
                              />
 
             <Dialog header="Deletar Produto"
-                        visible={this.state.displayConfirmation}
+                        visible={this.state.displayDeleteConfirmation}
                         modal = {true} //congela restante da tela
                         style={{ width: '350px' }}
                         footer={renderDeleteConfirmationFooter()}
-                        onHide={() => this.setState({displayConfirmation: false})}>
+                        onHide={() => this.setState({displayDeleteConfirmation: false})}>
                     <div className="confirmation-content row" style={{marginLeft: '10px'}}>
                         <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem', marginRight: '10px'}} />
                         <div style={{marginBottom: '10px'}}> Deseja confirmar exclusão? </div>

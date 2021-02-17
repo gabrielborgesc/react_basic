@@ -6,7 +6,7 @@ class GeneralServices extends React.Component {
         return new Promise(resolve => setTimeout(resolve, ms));
      }
 
-     static valueBodyTemplate = (value) => {
+    static valueBodyTemplate = (value) => {
         return currecyFormater.format(value, {locale: 'pt-BR'})
     }
 

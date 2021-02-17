@@ -11,8 +11,8 @@ class FileService extends ApiFileService {
         return this.post(`/uploadFile`, file)
     }
 
-    mutipleUpload(files){
-        return this.post(`/uploadMultipleFiles`, files)
+    mutipleUpload(data){
+        return this.post(`/uploadMultipleFiles`, data)
     }
 
     // getProgress(key){

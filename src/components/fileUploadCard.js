@@ -100,6 +100,7 @@ class FileUploadCard extends React.Component{
           }
         const timestamp = Date.now();
         bodyFormData.append('key', timestamp)
+        bodyFormData.append('description', 'File upload')
         this.uploadInProgress(true)
         this.fileService.mutipleUpload(bodyFormData)
         // .then(response => {

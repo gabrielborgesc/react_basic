@@ -29,7 +29,7 @@ class ParametrizeProduct extends React.Component {
         ncm: null,
         tipo: '',
         unidadeComercializada: '',
-        parametrized: '',
+        parametrized: 'false',
         productList: [],
         filteredProductList: [],
         displayConfirmation: false,

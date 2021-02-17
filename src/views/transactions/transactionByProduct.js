@@ -22,7 +22,6 @@ class TransactionByProduct extends React.Component {
         this.transactionService = new TransactionService();
         this.progressService = new ProgressService();
         this.generalServices = new GeneralServices();
-        this.testRef = React.createRef();
     }
 
     state = {
@@ -434,10 +433,11 @@ class TransactionByProduct extends React.Component {
                                 //    list = {this.state.filteredList}
                                    list = {this.props.list}
                                    deleteMultiple = {this.deleteMultipleTransactions}
-                                   search = {this.search}
+                                //    search = {this.search}
                                    loading = {this.state.loading || this.props.loading}
                                    disableDeleteButton = {this.state.disableDeleteButton || this.props.disableDeleteButton}
-                                   push = {this.props.push} />
+                                //    push = {this.props.push}
+                                    />
                     </div>
                     </>
               

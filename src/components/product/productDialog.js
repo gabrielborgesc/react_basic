@@ -168,7 +168,7 @@ class ProductDialog extends React.Component {
                 </div>
                 <br/>
                 <div className="p-field">
-                    <label htmlFor="type">Tipo</label>
+                    <label htmlFor="type">Tipo de produto</label>
                     <SelectMenu className={"form-control " + this.state.inputTipoErrorClass}
                                         name="tipo"
                                         list= {typeList} 

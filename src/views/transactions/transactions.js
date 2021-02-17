@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom'
 import { Button } from 'primereact/button'
 
 import { AuthContext } from '../../main/authProvider'
-import TransactionByProduct from './transactionByProduct'
 import TransactionService from '../../app/service/transactionService'
 import { InputMask } from 'primereact/inputmask'
 import FormGroup from '../../components/form-group'
@@ -13,6 +12,8 @@ import SelectMenu from '../../components/selectMenu'
 import * as popUp from '../../components/toastr'
 import GeneralServices from '../../app/service/generalServices'
 import HandleErrorService from '../../app/service/handleErrorService'
+import TransactionByProductTable from './transactionByProductTable'
+import TransactionByNFTable from './transactionByNFTable'
 
 class Transactions extends React.Component {
 
@@ -101,6 +102,29 @@ class Transactions extends React.Component {
         return check
     }
 
+    groupByNF = () => {
+        var NFList = []
+        this.state.transactionList.forEach(transaction => {
+            var NF = NFList.find(element => element.numero === transaction.numero)
+            if(NF){ //Nota fiscal já inserida
+                const index = NFList.indexOf(NF)
+                NF.valorTotal += transaction.valor
+                NF.transactions.push(transaction)
+                NFList[index] = NF
+            } else { //nova nota fiscal
+                NFList.push({
+                    dhEmi: transaction.dhEmi,
+                    numero: transaction.numero,
+                    valorTotal: transaction.valor,
+                    tipo: transaction.tipo,
+                    modelo: transaction.modelo,
+                    transactions: [transaction]
+                })
+            }
+        })
+        return NFList
+    }
+
     calculateTotalValue = transactions => {
         var totalValue = 0;
         transactions.forEach(transaction => {
@@ -128,16 +152,67 @@ class Transactions extends React.Component {
         .then(response => {
             this.setState({transactionList: response.data})
             this.setState({loading: false})
-            this.calculateTotalValue(response.data)
             this.setState({disableDeleteButton: false})
+            this.calculateTotalValue(response.data)
             if(!response.data.length && showInfoPopUp){
                 popUp.infoPopUp("Nenhuma movimentação encontrada com os dados informados")
             }          
         }).catch(error => {
-            HandleErrorService.handleError(this.props.hisotry.push, error)
+            HandleErrorService.handleError(this.props.history.push, error)
             this.setState({loading: false})
             this.setState({disableDeleteButton: false})
         })     
+    }
+
+    deleteMultipleTransactions = (listOfId) => {
+        if(listOfId){
+            this.setState({loading: true})
+            this.setState({disableDeleteButton: true})
+            const timestamp = Date.now()
+            var object = {
+                listOfTransactionsId: listOfId,
+                key: timestamp
+            }
+            this.transactionService.deleteMultipleTransactions(object)
+            // .then( response => {
+            //     popUp.successPopUp("Movimentação(ões) deletada(s) com sucesso")
+            //     this.get()
+            // }).catch(error => {
+            //     HandleErrorService.handleError(this.props.push, error)
+            //     this.setState({loading: false})
+            //     this.setState({disableDeleteButton: false})
+            // })
+            
+            this.getProgress(timestamp)
+        }
+    }
+
+    getProgress = async progressKey => {
+        await this.generalServices.sleep(1*1000)
+        this.progressService.getProgress(progressKey)
+        .then(async response => {
+            var progress = response.data.progress
+            if(parseInt(progress,10) === 100){
+                popUp.successPopUp("Movimentação(ões) deletada(s) com sucesso")
+                this.props.get()
+                this.progressService.deleteProgress(progressKey)
+            } else{ // progress !==100
+                await this.generalServices.sleep(1*1000)
+                this.getProgress(progressKey)
+            }
+        }).catch(async error => {
+            HandleErrorService.handleError(this.props.history.push, error)
+            await this.generalServices.sleep(1*1000)
+            this.setState({getProgressError: this.state.getProgressError+1})
+            if(this.state.getProgressError<5){
+                this.getProgress(progressKey)
+            } else{
+                this.setState({getProgressError: 0})
+                this.get()
+                this.progressService.deleteProgress(progressKey)
+
+            }
+        })
     }
 
     render() {
@@ -233,16 +308,27 @@ class Transactions extends React.Component {
                    {
                        this.state.currentLabel === this.state.productLabel ? 
                        (
-                            <TransactionByProduct 
-                                push={this.props.history.push}
-                                list={this.state.transactionList}
-                                get = {this.get}
-                                loading={this.state.loading}
-                                disableDeleteButton={this.state.disableDeleteButton}
-                                />
+                            <TransactionByProductTable 
+                                list = {this.state.transactionList}
+                                deleteMultiple = {this.deleteMultipleTransactions}
+                                loading = {this.state.loading}
+                                disableDeleteButton = {this.state.disableDeleteButton}
+                            />
+                            // <TransactionByProduct 
+                            //     push={this.props.history.push}
+                            //     list={this.state.transactionList}
+                            //     get = {this.get}
+                            //     loading={this.state.loading}
+                            //     disableDeleteButton={this.state.disableDeleteButton}
+                            //     />
                        ) :
                        (
-                           <div />
+                            <TransactionByNFTable 
+                                list = {this.groupByNF()}
+                                deleteMultiple = {this.deleteMultipleTransactions}
+                                loading = {this.state.loading}
+                                disableDeleteButton = {this.state.disableDeleteButton}
+                            />
                        )
                    }
                 </Card>

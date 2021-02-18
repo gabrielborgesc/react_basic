@@ -41,6 +41,7 @@ class ParametrizeProduct extends React.Component {
         parametrizeDescricao: '',
         parametrizeProductList: [],
         parametrizeFilteredProductsList: [],
+        resetSelectedBuyProducts: false
     }
 
     componentDidMount(){
@@ -57,6 +58,7 @@ class ParametrizeProduct extends React.Component {
 
     filter = () => {
         this.setState({loading: true})
+        this.setState({resetSelectedBuyProducts: true})
         var array = []
         this.state.productList.forEach(product => {
             var nome = (!this.state.nomeFornecedor || product.nomeFornecedor.toLowerCase().includes(this.state.nomeFornecedor.toLocaleLowerCase()))
@@ -76,6 +78,7 @@ class ParametrizeProduct extends React.Component {
     }
     
     search = (showInfoPopUp) => {
+        
         const productFilter = {
             codigo: this.state.codigo,
             descricao: this.state.descricao,
@@ -84,6 +87,7 @@ class ParametrizeProduct extends React.Component {
             unidadeComercializada: this.state.unidadeComercializada
         }
         this.setState({loading: true})
+        this.setState({resetSelectedBuyProducts: true})
         this.parametrizeService.search(productFilter)
         .then(response => {
             var productList = response.data
@@ -101,6 +105,10 @@ class ParametrizeProduct extends React.Component {
             this.setState({disableDeleteButton: false})
         })
         
+    }
+
+    completeResetedSelectedBuyProducts = () => {
+        this.setState({resetSelectedBuyProducts: false})
     }
 
     handleParametrizeChange = async (event) => {
@@ -321,6 +329,8 @@ class ParametrizeProduct extends React.Component {
                                    deparameterize = {this.deparameterize}
                                    setFilteredProducts = {this.setFilteredProducts}
                                    search = {this.search}
+                                   resetSelectedProducts = {this.state.resetSelectedBuyProducts}
+                                   completeResetedSelectedBuyProducts = {this.completeResetedSelectedBuyProducts}
                                    loading = {this.state.loading}
                                    disableDeleteButton = {this.state.disableDeleteButton}
                                    push = {this.props.push}

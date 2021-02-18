@@ -85,7 +85,7 @@ class UpdateStockDialog extends React.Component {
     checkUpdateHour = () => {
         var checkHour = false
         var checkMinutes = false
-        var length = this.state.updateStockHour.length === 5
+        var length = this.state.updateStockHour ? this.state.updateStockHour.length === 5 : null
         if(length){
             var hourArray = this.state.updateStockHour.split(':')
             var hour  = parseInt(hourArray[0], 10)
@@ -115,6 +115,13 @@ class UpdateStockDialog extends React.Component {
         this.setState({[name]: value})
     }
 
+    handleKeypress = e => {
+        //it triggers by pressing the enter key
+      if (e.key === "Enter") {
+        this.callSave();
+      }
+    }
+
     // calendarFocus = () => {
     //     this.setState({calendarFocus: true})
     // }
@@ -142,6 +149,7 @@ class UpdateStockDialog extends React.Component {
                             value = {this.state.quantidade}
                             name="quantidade"
                             onChange={this.handleChange}
+                            onKeyPress={this.handleKeypress}
                             id="inputQuantidade"
                             placeholder="Digite a quantidade"
                             />
@@ -166,7 +174,9 @@ class UpdateStockDialog extends React.Component {
                                 mask="99-99-9999"
                                 value={this.state.updateStockDate}
                                 placeholder="dd-mm-aaaa"
-                                onChange={this.handleChange} />
+                                onChange={this.handleChange}
+                                onKeyPress={this.handleKeypress}
+                                 />
                         <div className="invalid-feedback"> {this.state.errorUpadateDateMessage} </div>
                     <br />
                         <label htmlFor="hour">Horário da contagem de estoque</label>
@@ -176,7 +186,9 @@ class UpdateStockDialog extends React.Component {
                                 mask="99:99"
                                 value={this.state.updateStockHour}
                                 placeholder="hh:mm"
-                                onChange={this.handleChange} />
+                                onChange={this.handleChange}
+                                onKeyPress={this.handleKeypress}
+                                 />
                         <div className="invalid-feedback"> {this.state.errorUpadateHourMessage} </div>
 
                 </div>

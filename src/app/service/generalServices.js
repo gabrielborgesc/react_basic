@@ -15,6 +15,7 @@ class GeneralServices extends React.Component {
     }
 
     static convertToUsDate = (date) => {
+        if(!date) return ''
         var dateArray = date.split('-')
         return dateArray[1] + '-' + dateArray[0] + '-' + dateArray[2]
     }

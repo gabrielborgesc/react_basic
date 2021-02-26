@@ -285,7 +285,6 @@ class Transactions extends React.Component {
                 <Card title = "Movimentações"> 
                 <div className="row">
                     <div className="col-md-5" style={{marginLeft:'15px', maxWidth:'615px'}}>
-                        <div ref={this.testRef}/>
                     <label htmlFor="date">A partir de</label>
                         <InputMask id="beginDate"
                                 name="beginDate"
@@ -372,13 +371,6 @@ class Transactions extends React.Component {
                                 loading = {this.state.loading}
                                 disableDeleteButton = {this.state.disableDeleteButton}
                             />
-                            // <TransactionByProduct 
-                            //     push={this.props.history.push}
-                            //     list={this.state.transactionList}
-                            //     get = {this.get}
-                            //     loading={this.state.loading}
-                            //     disableDeleteButton={this.state.disableDeleteButton}
-                            //     />
                        ) :
                        (
                             <TransactionByNFTable 

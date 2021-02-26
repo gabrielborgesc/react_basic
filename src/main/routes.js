@@ -8,6 +8,7 @@ import RecoverPassword from '../views/recoverPassword/recoverPassword'
 import { Route, Switch, HashRouter, Redirect } from 'react-router-dom'
 import { AuthConsumer } from './authProvider'
 import SearchProduct from '../views/product/searchProducts'
+import InventoryLaunch from '../views/inventory/inventoryLaunch'
 import ResgisterProduct from '../views/product/resgisterProducts'
 import MenuHome from '../views/menuHome'
 import Transactions from '../views/transactions/transactions'
@@ -56,9 +57,9 @@ function Routes(props){
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/home/:name?/:email?" component = {MenuHome} />
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/register" component = {ResgisterProduct} />
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/searchProducts" component = {SearchProduct} />
+                <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/inventoryLaunch" component = {InventoryLaunch} />
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/transactions" component = {Transactions} />
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/parameterize" component = {Parametrize} />
-                {/* <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/searchEntry" component = {SearchEntry} /> */}
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/changePassword" component = {ChangePassword} />
                 <AuthRoute isAuth={props.isAuth} checkSession={props.checkSession} path = "/" />
             </Switch>

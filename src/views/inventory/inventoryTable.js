@@ -9,13 +9,10 @@ import { Dialog } from 'primereact/dialog'
 import currecyFormater from 'currency-formatter'
 import * as popUp from '../../components/toastr'
 import ProductService from '../../app/service/productService'
-import HandleErrorService from '../../app/service/handleErrorService'
-import ProductDialog from '../../components/product/productDialog'
-import UpdateStockDialog from '../../components/product/updateStockDialog'
 import TableFilters from '../../components/tableFilters'
 import GeneralServices from '../../app/service/generalServices'
 
-class ProductCrudTable extends React.Component {
+class InventoryTable extends React.Component {
 
     state = {
         codigo: null,
@@ -53,74 +50,11 @@ class ProductCrudTable extends React.Component {
     valueBodyTemplate = (rowData) => {
         return currecyFormater.format(rowData.value, {locale: 'pt-BR'})
     }
-    
-    editProduct = (product) => {
-        this.setState({codigo: product.codigo})
-        this.setState({descricao: product.descricao})
-        this.setState({ncm: product.ncm})
-        this.setState({tipo: product.tipo})
-        this.setState({unidadeComercializada: product.unidadeComercializada})
-        this.setState({productDialog: true})
-        this.setState({editId: product.id})
-        
-    }
-
-    updateStock = (product) => {
-        this.setState({quantidade: product.quantidade})
-        this.setState({updateStockId: product.id})
-        this.setState({updateStockDialog: true})
-
-    }
 
     hideDialog = (name) => {
         this.setState({[name]: false})
     }
 
-    exportCSV = () => {
-        this.dt.current.exportCSV();
-    }
-
-    delete = () => {
-        if(this.state.selectedProducts){
-            this.setState({displayConfirmation: true})
-        } else {
-            popUp.warningPopUp("Nenhum produto foi selecionado para exclusão")
-        }
-    }
-    
-    updateProduct = (product) => {
-            this.productService.update(this.state.editId, product)
-            .then(response => {
-                popUp.successPopUp("Produto editado com sucesso")
-                this.props.search()
-            }).catch(error => {
-                HandleErrorService.handleError(this.props.push, error)
-        })
-        this.setState({productDialog: false})
-    }
-    
-    updateProductStock = (product) => {
-        this.productService.updateStock(this.state.updateStockId, product)
-        .then(response => {
-            popUp.successPopUp("Produto editado com sucesso")
-            this.props.search()
-        }).catch(error => {
-            HandleErrorService.handleError(this.props.push, error)
-    })
-    this.setState({updateStockDialog: false})
-}
-
-    confirmDelete = () => {
-        this.setState({displayConfirmation: false})
-        this.setState({selectedProducts: null})
-        if(this.state.selectedProducts){
-            var listOfId = []
-            Array.from(this.state.selectedProducts).forEach(selectedProduct => {
-                listOfId.push(selectedProduct.id)
-            })
-        }
-        this.props.deleteMultiple(listOfId)
-    }
 
     onFilterChange = (event, filterField) => {
         const name = event.target.name
@@ -133,10 +67,6 @@ class ProductCrudTable extends React.Component {
         const rightToolbarTemplate = () => {
             return (
                 <React.Fragment>
-                    <Button label="Deletar" icon="pi pi-trash" className="p-button-danger"
-                            onClick={this.delete}
-                            disabled = {this.props.disableDeleteButton}
-                            />
                 </React.Fragment>
             )
         }
@@ -144,37 +74,43 @@ class ProductCrudTable extends React.Component {
         const leftToolbarTemplate = () => {
             return (
                 <React.Fragment>
-                    {/* <FileUpload mode="basic" accept="*" maxFileSize={1000000} label="Import" chooseLabel="Import" className="p-mr-2 p-d-inline-block" /> */}
-                    <Button label="Exportar" icon="pi pi-upload" className="p-button-help" onClick={this.exportCSV} />
+                    <Button label="Confirmar" icon="pi pi-check" className="p-button-success"
+                            onClick={this.delete}
+                            disabled = {this.props.disableDeleteButton}
+                    />
                 </React.Fragment>
             )
         }
 
-        const actionBodyTemplate = (rowData) => {
+        const stockBody = (rowData) => {
             return (
                 <React.Fragment>
-                    <Button title = "Atualizar estoque"
-                            icon="pi pi-book"
-                            className="p-button-rounded p-button-success p-mr-2"
+                    {
+                        rowData.quantidade ? (
+                            <>
+                            <Button label={rowData.quantidade}
+                            className="p-button-rounded p-button-text p-button-secondary p-mr-2"
                             style={ {marginLeft: '3px'} }
-                            onClick={() => this.updateStock(rowData)} />
-                    <Button title = "Editar"
-                            icon="pi pi-pencil"
-                            className="p-button-rounded p-button-primary p-mr-2"
-                            style={ {marginLeft: '3px'} }
-                            onClick={() => this.editProduct(rowData)} />
+                            />
+                            <Button title = "Cancelar estoque"
+                                icon="pi pi-times"
+                                className="p-button-rounded p-button-danger p-mr-2"
+                                style={ {marginLeft: '3px'} }
+                                onClick={() => this.updateStock(rowData)}
+                                />
+                            </>
+                        ) : (
+                                <Button title = "Lançar estoque"
+                                icon="pi pi-pencil"
+                                className="p-button-rounded p-button-success p-mr-2"
+                                style={ {marginLeft: '3px'} }
+                                onClick={() => this.updateStock(rowData)}
+                                />
+                        )
+                    }
+                    
+                    
                 </React.Fragment>
-            );
-        }
-
-        const renderDeleteConfirmationFooter = () => {
-            return (
-                <div>
-                    <Button label="Confirmar" icon="pi pi-check"
-                            onClick={this.confirmDelete} autoFocus />
-                    <Button label="Cancelar" icon="pi pi-times" onClick={() => this.setState({displayConfirmation: false})}
-                            className="p-button-text" />
-                </div>
             );
         }
 
@@ -241,41 +177,14 @@ class ProductCrudTable extends React.Component {
                     <Column field={this.state.unitField} header="Unidade" sortable style ={ {width: '25px'} }
                     filter filterElement={unitFilterElement} 
                     />
-                    <Column field="quantidade" header="Estoque" sortable style ={ {width: '20px'} }></Column>
-                    <Column body={actionBodyTemplate} style ={ {width: '20px'} }></Column>
+                    <Column field="quantidade" header="Estoque" body={stockBody} sortable style ={ {width: '20px'} } />
+
+                    {/* <Column body={actionBodyTemplate} style ={ {width: '20px'} }></Column> */}
                     <Column field="timestamp" header="Última atualização manual de estoque"
                             body={rowData => rowData.dataAtualizacaoEstoque} 
                             sortable style ={ {width: '33px'} }></Column>
                 </DataTable>
             </div>
-
-            <ProductDialog  save={this.updateProduct}
-                            hideDialog={this.hideDialog}
-                            visible={this.state.productDialog}
-                            header="Editar Produto"
-                            state={this.state}
-                             />
-            
-            <UpdateStockDialog  save={this.updateProductStock}
-                            hideDialog={this.hideDialog}
-                            visible={this.state.updateStockDialog}
-                            header="Atualizar Estoque"
-                            quantidade={this.state.quantidade}
-                            productId={this.state.updateStockId}
-                            state={{}}
-                             />
-
-            <Dialog header="Deletar Produto"
-                        visible={this.state.displayConfirmation}
-                        modal = {true} //congela restante da tela
-                        style={{ maxWidth: '350px' }}
-                        footer={renderDeleteConfirmationFooter()}
-                        onHide={() => this.setState({displayConfirmation: false})}>
-                    <div className="confirmation-content row" style={{marginLeft: '10px'}}>
-                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem', marginRight: '10px'}} />
-                        <div style={{marginBottom: '10px'}}> Deseja confirmar exclusão? </div>
-                    </div>
-            </Dialog>
         </div>
         )
     }
@@ -283,4 +192,4 @@ class ProductCrudTable extends React.Component {
 
 }  
 
-export default ProductCrudTable
+export default InventoryTable

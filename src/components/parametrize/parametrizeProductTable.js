@@ -118,6 +118,8 @@ class ParametrizeProductTable extends React.Component {
                 <Toolbar className="p-mb-4" left={leftToolbarTemplate} ></Toolbar>
 
                 <DataTable value={this.props.list}
+                            className="p-datatable-sm"
+                            rowHover
                             selection={this.state.selectedProducts}
                             onSelectionChange={this.handleSelectionChange}
                             scrollable

@@ -190,6 +190,7 @@ class TransactionByNFTable extends React.Component {
                 <h5>Itens da nota {rowData.numero}</h5>
                 <DataTable ref={this.dt} value={rowData.transactions}
                             className="p-datatable-sm"
+                            rowHover
                             scrollable
                             scrollHeight="300px"
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
@@ -256,6 +257,7 @@ class TransactionByNFTable extends React.Component {
 
                 <DataTable ref={this.dt} value={this.props.list}
                             className="p-datatable-sm"
+                            rowHover
                             selection={this.state.selectedNFs}
                             onSelectionChange={(e) => this.setState({selectedNFs: e.value})}
                             scrollable

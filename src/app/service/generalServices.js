@@ -24,6 +24,24 @@ class GeneralServices extends React.Component {
         return dateArray[1] + '-' + dateArray[2] + '-' + dateArray[0]
     }
 
+    static checkValidHour = (hour) => {
+      var checkHour = false
+      var checkMinutes = false
+      var length = hour ? hour.length === 5 : null
+      if(length){
+          var hourArray = hour.split(':')
+          var intHour  = parseInt(hourArray[0], 10)
+          var minutes = parseInt(hourArray[1], 10)
+          if(intHour>=0 && intHour<24){
+              checkHour=true
+          }
+          if(minutes>=0 && minutes<=60){
+              checkMinutes=true
+          }
+      }
+      return length && checkHour && checkMinutes
+    }
+
     static compareIntValues( product1, product2 ) {
         var value1 = parseInt(product1.value, 10)
         var value2 = parseInt(product2.value, 10)

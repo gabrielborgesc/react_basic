@@ -74,30 +74,12 @@ class UpdateStockDialog extends React.Component {
             this.setState({errorUpadateDateMessage:"Informe uma data válida"})
             check = false
         }
-        if(!this.checkUpdateHour()){
+        if(!GeneralServices.checkValidHour(this.state.updateStockHour)){
             this.setState({inputUpadateHourErrorClass: "is-invalid"})
             this.setState({errorUpadateHourMessage:"Informe um horário válido"})
             check = false
         }
         return check;
-    }
-
-    checkUpdateHour = () => {
-        var checkHour = false
-        var checkMinutes = false
-        var length = this.state.updateStockHour ? this.state.updateStockHour.length === 5 : null
-        if(length){
-            var hourArray = this.state.updateStockHour.split(':')
-            var hour  = parseInt(hourArray[0], 10)
-            var minutes = parseInt(hourArray[1], 10)
-            if(hour>=0 && hour<24){
-                checkHour=true
-            }
-            if(minutes>=0 && minutes<=60){
-                checkMinutes=true
-            }
-        }
-        return length && checkHour && checkMinutes
     }
 
     resetView = () => {

@@ -208,6 +208,7 @@ class FileUploadCard extends React.Component{
                         <div className="col-lg-12">
                             <div className="bs-component">
                             <DataTable value={this.state.files}
+                                        rowHover
                                         selection={this.state.selectedFiles}
                                         onSelectionChange={(e) => this.setState({selectedFiles: e.value})}
                                         scrollable

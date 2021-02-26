@@ -274,6 +274,8 @@ class BuyProductCrudTable extends React.Component {
                 <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={this.dt} value={this.props.list}
+                            className="p-datatable-sm"
+                            rowHover
                             selection={this.checkSelectedProducts()}
                             onSelectionChange={this.handleSelectionChange}
                             scrollable

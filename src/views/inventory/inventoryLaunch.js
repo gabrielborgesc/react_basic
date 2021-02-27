@@ -17,6 +17,7 @@ class InvetoryLaunch extends React.Component {
     constructor(){
         super();
         this.productService = new ProductService();
+        this.generalServices = new GeneralServices();
     }
 
     state = {
@@ -35,7 +36,8 @@ class InvetoryLaunch extends React.Component {
         hour: '',
         inputHourErrorClass: '',
         errorHourMessage: '',
-        selectionEnabled: false
+        selectionEnabled: false,
+        updatedProducts: []
     }
 
     componentDidMount(){
@@ -126,6 +128,40 @@ class InvetoryLaunch extends React.Component {
         this.setState({selectionEnabled: true})
     }
 
+    updateStockOnFilteredProducts = (product) =>{
+        var filteredProductList = this.state.filteredProductList
+        var filteredProduct = filteredProductList.find(element => element.id === product.id)
+        var aux = JSON.parse(JSON.stringify(filteredProduct));
+        aux.quantidade = product.quantidade
+        aux.dataAtualizacaoEstoque = product.dataAtualizacaoEstoque
+        const index = filteredProductList.indexOf(filteredProduct)
+        filteredProductList[index] = aux
+        this.setState({filteredProductList})
+        this.handleUpdatedProducts(filteredProduct)
+    }
+
+    handleUpdatedProducts = (updatedProduct) => {
+        var updatedProducts = this.state.updatedProducts
+        // console.log('initial', updatedProducts)
+        var originalProduct = this.state.productList.find(element => element.id === updatedProduct.id)
+        console.log('original', originalProduct)
+        // console.log('updatedProduct', updatedProduct)
+        // if(originalProduct.quantidade === updatedProduct.quantidade
+        //     && originalProduct.dataAtualizacaoEstoque === updatedProduct.dataAtualizacaoEstoque){ //voltou ao original, retirar da lista
+        //         // console.log('entoru no if')
+        //         var element = this.state.updatedProducts.find(element => element.id === updatedProduct.id)
+        //         const index = this.state.updatedProducts.indexOf(element)
+        //         updatedProducts.splice(index, 1)
+        //         this.setState({updatedProducts: updatedProducts})
+        //     }
+        // else{ //foi modificado em relação ao original, adicionar à lista
+        //     // console.log('entoru no else')
+        //     updatedProducts.push(updatedProduct)
+        //     this.setState({updatedProducts: updatedProducts})
+        // }
+        // this.generalServices.sleep(100)
+        // console.log('final', this.state.updatedProducts)
+    }
 
     render() {
         return (
@@ -171,9 +207,13 @@ class InvetoryLaunch extends React.Component {
                         {
                             this.state.selectionEnabled ? (
                                 <InventoryTable list = {this.state.filteredProductList}
+                                   updateStockFunction={this.updateStockOnFilteredProducts}
                                    search = {this.search}
                                    loading = {this.state.loading}
-                                   push = {this.props.history.push} />
+                                   push = {this.props.history.push}
+                                   date={this.state.date}
+                                   hour={this.state.hour}
+                                   />
                             ) : (
                                 <div />
                             )

@@ -260,9 +260,6 @@ class ProductCrudTable extends React.Component {
                             hideDialog={this.hideDialog}
                             visible={this.state.updateStockDialog}
                             header="Atualizar Estoque"
-                            quantidade={this.state.quantidade}
-                            productId={this.state.updateStockId}
-                            state={{}}
                              />
 
             <Dialog header="Deletar Produto"

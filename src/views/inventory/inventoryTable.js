@@ -11,6 +11,7 @@ import * as popUp from '../../components/toastr'
 import ProductService from '../../app/service/productService'
 import TableFilters from '../../components/tableFilters'
 import GeneralServices from '../../app/service/generalServices'
+import UpdateStockDialog from '../../components/product/updateStockDialog'
 
 class InventoryTable extends React.Component {
 
@@ -37,6 +38,8 @@ class InventoryTable extends React.Component {
         selectedCfops: null,
         unitField: 'unidadeComercializada',
         selectedUnits: null,
+        updateStockDialog: false,
+        productToUpdateId: null
     }
     constructor(){
         super()
@@ -60,6 +63,18 @@ class InventoryTable extends React.Component {
         const name = event.target.name
         this.dt.current.filter(event.value, filterField, 'in');
         this.setState({[name]: event.value})
+    }
+
+    updateStock = (rowData) => {
+        this.setState({productToUpdateId: rowData.id})
+        this.setState({updateStockDialog: true})
+    }
+
+    save = (product) => {
+        product.id = this.state.productToUpdateId
+        this.props.updateStockFunction(product)
+        this.setState({productToUpdateId: null})
+        this.setState({updateStockDialog: false})
     }
 
     render (){
@@ -96,7 +111,7 @@ class InventoryTable extends React.Component {
                                 icon="pi pi-times"
                                 className="p-button-rounded p-button-danger p-mr-2"
                                 style={ {marginLeft: '3px'} }
-                                onClick={() => this.updateStock(rowData)}
+                                onClick={() => this.cancelStock(rowData)}
                                 />
                             </>
                         ) : (
@@ -185,6 +200,24 @@ class InventoryTable extends React.Component {
                             sortable style ={ {width: '33px'} }></Column>
                 </DataTable>
             </div>
+                <UpdateStockDialog  save={this.save}
+                            hideDialog={this.hideDialog}
+                            visible={this.state.updateStockDialog}
+                            header="Atualizar Estoque"
+                            date={this.props.date}
+                            hour={this.props.hour}
+                />
+                {/* <Dialog header="Desfazer Alteração"
+                        visible={this.state.displayConfirmation}
+                        modal = {true} //congela restante da tela
+                        style={{ maxWidth: '350px' }}
+                        footer={renderDeleteConfirmationFooter()}
+                        onHide={() => this.setState({displayConfirmation: false})}>
+                    <div className="confirmation-content row" style={{marginLeft: '10px'}}>
+                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem', marginRight: '10px'}} />
+                        <div style={{marginBottom: '10px'}}> Deseja desfazer a alteração de estoque? </div>
+                    </div>
+                </Dialog> */}
         </div>
         )
     }

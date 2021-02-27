@@ -27,9 +27,8 @@ class UpdateStockDialog extends React.Component {
 
     componentDidUpdate(){
         if(this.props.visible && !this.state.didUpdated){
-            this.setState({quantidade: this.props.state.quantidade})
-            this.setState({updateStockDate: this.props.state.updateStockDate})
-            this.setState({updateStockHour: this.props.state.updateStockHour})
+            if(this.props.date) this.setState({updateStockDate: this.props.date})
+            if(this.props.hour) this.setState({updateStockHour: this.props.hour})
             this.setState({didUpdated: true})
             this.resetView()
         }
@@ -152,6 +151,7 @@ class UpdateStockDialog extends React.Component {
                         <label htmlFor="date">Data da contagem de estoque</label>
                         <InputMask id="date"
                                 name="updateStockDate"
+                                disabled={this.props.date}
                                 className={"form-control " + this.state.inputUpadateDateErrorClass }
                                 mask="99-99-9999"
                                 value={this.state.updateStockDate}
@@ -164,6 +164,7 @@ class UpdateStockDialog extends React.Component {
                         <label htmlFor="hour">Horário da contagem de estoque</label>
                         <InputMask id="hour"
                                 name="updateStockHour"
+                                disabled={this.props.hour}
                                 className={"form-control " + this.state.inputUpadateHourErrorClass }
                                 mask="99:99"
                                 value={this.state.updateStockHour}

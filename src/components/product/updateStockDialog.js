@@ -96,6 +96,14 @@ class UpdateStockDialog extends React.Component {
         this.setState({[name]: value})
     }
 
+    handleNumberChange = (e) => {
+        const value = e.target.value
+        const name = e.target.name
+        if(value < 0)
+            return
+        this.setState({[name]: value})
+    }
+
     handleKeypress = e => {
         //it triggers by pressing the enter key
       if (e.key === "Enter") {
@@ -129,7 +137,7 @@ class UpdateStockDialog extends React.Component {
                             className={"form-control " + this.state.inputQuantidadeErrorClass }
                             value = {this.state.quantidade}
                             name="quantidade"
-                            onChange={this.handleChange}
+                            onChange={this.handleNumberChange}
                             onKeyPress={this.handleKeypress}
                             id="inputQuantidade"
                             placeholder="Digite a quantidade"

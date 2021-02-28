@@ -11,7 +11,7 @@ class MenuHome extends React.Component{
     render() {
         return(
             <div className="bs-docs-section" >
-                <Card title="Importação de arquivos">
+                <Card title="Importação de Arquivos">
                     Importe as notas fiscais para que o sistema faça todo o controle de estoque e movimentação de produtos
                     <br />
                     <a href="#/register"> 
@@ -23,7 +23,7 @@ class MenuHome extends React.Component{
                     </a>
 
                 </Card>
-                <Card title="Lançamento de inventário">
+                <Card title="Lançamento de Inventário">
                     Faça o lançamento de inventário dos seus produtos para que o sistema possa controlar suas movimentações
                     <br/>
                     <a href="#/inventoryLaunch"> 
@@ -35,7 +35,7 @@ class MenuHome extends React.Component{
                     </a>
 
                 </Card>
-                <Card title="Busca de Produtos cadastrados">
+                <Card title="Busca de Produtos Cadastrados">
                     Busque, edite e delete os seus produtos cadastrados
                     <br/>
                     <a href="#/searchProducts"> 

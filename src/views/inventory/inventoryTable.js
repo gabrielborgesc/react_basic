@@ -105,6 +105,10 @@ class InventoryTable extends React.Component {
     }
 
     checkLaunch = async () => {
+        if(!this.props.updatedProductsList || this.props.updatedProductsList.length === 0){
+            popUp.infoPopUp('Nenhuma alteração foi realizada')
+            return
+        }
         await this.onFilterChange({
             target: {name: 'selectedCodes'},
             value: null

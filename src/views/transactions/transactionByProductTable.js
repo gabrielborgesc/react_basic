@@ -222,6 +222,7 @@ class TransactionByProductTable extends React.Component {
 
                 <DataTable ref={this.dt} value={this.props.list}
                             className="p-datatable-sm"
+                            rowHover
                             selection={this.state.selectedTransactions}
                             onSelectionChange={(e) => this.setState({selectedTransactions: e.value})}
                             scrollable

@@ -127,7 +127,6 @@ class BuyProductCrudTable extends React.Component {
             })
         }
         this.props.deparameterize(listOfId)
-        console.log('list of id', listOfId)
         this.setState({selectedProducts: null})
     }
 
@@ -152,6 +151,16 @@ class BuyProductCrudTable extends React.Component {
 
     parametrized = (parametrized) => {
         return this.state.selectedProducts.some(buyProduct => buyProduct.parametrized === parametrized)
+    }
+
+    checkSelectedProducts = () => {
+        var selected = this.state.selectedProducts
+        if(this.props.resetSelectedProducts){
+            selected = null
+            this.setState({selectedProducts: null})
+            this.props.completeResetedSelectedBuyProducts()
+        }
+        return selected
     }
 
     render (){
@@ -265,7 +274,9 @@ class BuyProductCrudTable extends React.Component {
                 <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={this.dt} value={this.props.list}
-                            selection={this.state.selectedProducts}
+                            className="p-datatable-sm"
+                            rowHover
+                            selection={this.checkSelectedProducts()}
                             onSelectionChange={this.handleSelectionChange}
                             scrollable
                             scrollHeight="500px"

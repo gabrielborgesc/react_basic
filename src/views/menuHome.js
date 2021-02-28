@@ -23,13 +23,25 @@ class MenuHome extends React.Component{
                     </a>
 
                 </Card>
+                <Card title="Lançamento de inventário">
+                    Faça o lançamento de inventário dos seus produtos para que o sistema possa controlar suas movimentações
+                    <br/>
+                    <a href="#/inventoryLaunch"> 
+                    <Button 
+                            label="Ir para o inventário"
+                            icon="pi pi-pencil"
+                            style={ {maxHeight: '35px', marginTop: '5px'} }
+                        />
+                    </a>
+
+                </Card>
                 <Card title="Busca de Produtos cadastrados">
                     Busque, edite e delete os seus produtos cadastrados
                     <br/>
                     <a href="#/searchProducts"> 
                     <Button 
                             label="Ir para os produtos"
-                            icon="pi pi-arrow-right"
+                            icon="pi pi-search"
                             style={ {maxHeight: '35px', marginTop: '5px'} }
                         />
                     </a>

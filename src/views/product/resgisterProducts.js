@@ -48,7 +48,7 @@ class ResgisterProduct extends React.Component {
     render() {
             return (
                 <div className="bs-docs-section d-flex" style={{minHeight:'500px'}} >
-                <Card title = "Cadastro de Produtos">
+                <Card title = "Importação de Arquivos">
                     <div className = "col-md-12">
                     <div className="row">
                     <div className = "col-md-5">

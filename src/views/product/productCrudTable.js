@@ -135,7 +135,8 @@ class ProductCrudTable extends React.Component {
                 <React.Fragment>
                     <Button label="Deletar" icon="pi pi-trash" className="p-button-danger"
                             onClick={this.delete}
-                            disabled = {this.props.disableDeleteButton}
+                            disabled = {this.props.disableDeleteButton || !this.state.selectedProducts
+                                        || this.state.selectedProducts.length === 0}
                             />
                 </React.Fragment>
             )

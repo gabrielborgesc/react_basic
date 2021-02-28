@@ -29,6 +29,7 @@ class UpdateStockDialog extends React.Component {
         if(this.props.visible && !this.state.didUpdated){
             if(this.props.date) this.setState({updateStockDate: this.props.date})
             if(this.props.hour) this.setState({updateStockHour: this.props.hour})
+            this.setState({quantidade: null})
             this.setState({didUpdated: true})
             this.resetView()
         }

@@ -26,8 +26,8 @@ class InvetoryLaunch extends React.Component {
         ncm: null,
         tipo: '',
         unidadeComercializada: '',
-        productList: [],
-        filteredProductList: [],
+        productsList: [],
+        filteredProductsList: [],
         displayConfirmation: false,
         loading: false,
         date: '',
@@ -37,7 +37,7 @@ class InvetoryLaunch extends React.Component {
         inputHourErrorClass: '',
         errorHourMessage: '',
         selectionEnabled: false,
-        updatedProducts: []
+        updatedProductsList: []
     }
 
     componentDidMount(){
@@ -54,7 +54,7 @@ class InvetoryLaunch extends React.Component {
     filter = () => {
         this.setState({loading: true})
         var array = []
-        this.state.productList.forEach(product => {
+        this.state.productsList.forEach(product => {
             var codigo = (!this.state.codigo || product.codigo === this.state.codigo)
             var ncm = (!this.state.ncm || product.ncm === parseInt(this.state.ncm, 10))
             var tipo = (!this.state.tipo || !product.tipo || product.tipo.toLowerCase().includes(this.state.tipo.toLowerCase()))
@@ -66,7 +66,7 @@ class InvetoryLaunch extends React.Component {
             }
         })
         this.setState({loading: false})
-        this.setState({filteredProductList: array})
+        this.setState({filteredProductsList: array})
     }
 
     search = (showInfoPopUp) => {
@@ -80,9 +80,9 @@ class InvetoryLaunch extends React.Component {
         this.setState({loading: true})
         this.productService.search(productFilter)
         .then(response => {
-            var productList = response.data
-            this.setState({productList})
-            this.setState({filteredProductList: productList})
+            var productsList = response.data
+            this.setState({productsList})
+            this.setState({filteredProductsList: productsList})
             this.filter()
             this.setState({disableDeleteButton: false})
             if(!response.data.length && showInfoPopUp){
@@ -128,35 +128,43 @@ class InvetoryLaunch extends React.Component {
         this.setState({selectionEnabled: true})
     }
 
-    updateStockOnFilteredProducts = (product) =>{
-        var filteredProductList = this.state.filteredProductList
-        var filteredProduct = filteredProductList.find(element => element.id === product.id)
-        var filteredProductCOPY = JSON.parse(JSON.stringify(filteredProduct));
+    updateStockOnFilteredProducts = (product) => {
+        var filteredProductsList = this.state.filteredProductsList
+        var filteredProductCOPY = JSON.parse(JSON.stringify(filteredProductsList.find(element => element.id === product.id))) //copiar obj sem referência
         filteredProductCOPY.quantidade = product.quantidade
         filteredProductCOPY.dataAtualizacaoEstoque = product.dataAtualizacaoEstoque
-        const index = filteredProductList.indexOf(filteredProduct)
-        filteredProductList[index] = filteredProductCOPY
-        this.setState({filteredProductList})
-        this.handleUpdatedProducts(filteredProductCOPY)
+        const index = filteredProductsList.findIndex(element => element.id === filteredProductCOPY.id)
+        filteredProductsList[index] = filteredProductCOPY
+        this.setState({filteredProductsList})
+        this.pushUpdatedProduct(filteredProductCOPY)
     }
 
-    handleUpdatedProducts = (updatedProduct) => {
-        var updatedProducts = this.state.updatedProducts
-        // console.log('initial', updatedProducts)
-        var originalProduct = this.state.productList.find(element => element.id === updatedProduct.id)
-        if(originalProduct.quantidade === updatedProduct.quantidade
-            && originalProduct.dataAtualizacaoEstoque === updatedProduct.dataAtualizacaoEstoque){ //voltou ao original, retirar da lista
-                var element = updatedProducts.find(element => element.id === updatedProduct.id)
-                const index = updatedProducts.indexOf(element)
-                updatedProducts.splice(index, 1)
-                this.setState({updatedProducts: updatedProducts})
-            }
-        else{ //foi modificado em relação ao original, adicionar à lista
-            updatedProducts.push(updatedProduct)
-            this.setState({updatedProducts})
-        }
+    pushUpdatedProduct = (updatedProductToBePushed) => {
+        var updatedProductsList = this.state.updatedProductsList
+        updatedProductsList.push(updatedProductToBePushed)
+        this.setState({updatedProductsList})
+    }
+
+    undoUpdateStockOnFilteredProducts = (productId) => {
+        var originalProduct = JSON.parse(JSON.stringify(this.state.productsList.find(element => element.id === productId)))
+        const index = this.state.filteredProductsList.findIndex(element => element.id === productId)
+        var filteredProductsList = this.state.filteredProductsList
+        filteredProductsList[index] = originalProduct
+        this.setState({filteredProductsList})
+        this.removeUpdatedProduct(originalProduct)
         this.generalServices.sleep(100)
-        console.log('final', this.state.updatedProducts)
+    }
+
+    removeUpdatedProduct = (updatedProductToBeRemoved) => {
+        var updatedProductsList = this.state.updatedProductsList
+        const index = updatedProductsList.findIndex(element => element.id === updatedProductToBeRemoved.id)
+        updatedProductsList.splice(index, 1)
+        this.setState({updatedProductsList})
+        this.generalServices.sleep(100)
+    }
+
+    resetUpdatedProductsList = () => {
+        this.setState({updatedProductsList: []})
     }
 
     render() {
@@ -202,8 +210,11 @@ class InvetoryLaunch extends React.Component {
                     <div className="bs-docs-section" >
                         {
                             this.state.selectionEnabled ? (
-                                <InventoryTable list = {this.state.filteredProductList}
+                                <InventoryTable list = {this.state.filteredProductsList}
+                                   updatedProductsList={this.state.updatedProductsList}
                                    updateStockFunction={this.updateStockOnFilteredProducts}
+                                   undoUpdateStockFunction={this.undoUpdateStockOnFilteredProducts}
+                                   resetUpdatedProductsList={this.resetUpdatedProductsList}
                                    search = {this.search}
                                    loading = {this.state.loading}
                                    push = {this.props.history.push}

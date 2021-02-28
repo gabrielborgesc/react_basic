@@ -12,6 +12,7 @@ import ProductService from '../../app/service/productService'
 import TableFilters from '../../components/tableFilters'
 import GeneralServices from '../../app/service/generalServices'
 import UpdateStockDialog from '../../components/product/updateStockDialog'
+import HandleErrorService from '../../app/service/handleErrorService'
 
 class InventoryTable extends React.Component {
 
@@ -25,7 +26,7 @@ class InventoryTable extends React.Component {
         selectedProducts: null,
         productDialog: false,
         updateStockDialog: false,
-        displayConfirmation: false,
+        displayUndoUpdateStockConfirmation: false,
         editId: null,
         updateStockId: null,
         codigoField: 'codigo',
@@ -39,7 +40,8 @@ class InventoryTable extends React.Component {
         unitField: 'unidadeComercializada',
         selectedUnits: null,
         updateStockDialog: false,
-        productToUpdateId: null
+        productToUpdateId: null,
+        checkLaunch: false
     }
     constructor(){
         super()
@@ -70,11 +72,65 @@ class InventoryTable extends React.Component {
         this.setState({updateStockDialog: true})
     }
 
+    cancelStock = (rowData) => {
+        this.setState({productToUpdateId: rowData.id})
+        this.setState({displayUndoUpdateStockConfirmation: true})
+    }
+
     save = (product) => {
         product.id = this.state.productToUpdateId
         this.props.updateStockFunction(product)
         this.setState({productToUpdateId: null})
         this.setState({updateStockDialog: false})
+    }
+
+    confirmUndoUpdateStock = () => {
+        this.props.undoUpdateStockFunction(this.state.productToUpdateId)
+        this.setState({productToUpdateId: null})
+        this.setState({displayUndoUpdateStockConfirmation: false})
+    }
+
+    confirmInvetoryLaunch = () => {
+        this.productService.updateMutipleProductsStock({
+            productsList: this.props.updatedProductsList
+        })
+        .then(response => {
+            popUp.successPopUp("Lancçamento de Invetário concluído com sucesso")
+            this.props.search()
+            this.setState({checkLaunch: false})
+            this.props.resetUpdatedProductsList()
+        }).catch(error => {
+            HandleErrorService.handleError(this.props.push, error)
+        })
+    }
+
+    checkLaunch = async () => {
+        await this.onFilterChange({
+            target: {name: 'selectedCodes'},
+            value: null
+        }, this.state.codigoField)
+
+        await this.onFilterChange({
+            target: {name: 'selectedDescriptions'},
+            value: null
+        }, this.state.descricaoField)
+
+        await this.onFilterChange({
+            target: {name: 'selectedNCM'},
+            value: null
+        }, this.state.NCMField)
+
+        await this.onFilterChange({
+            target: {name: 'selectedCfops'},
+            value: null
+        }, this.state.cfopField)
+
+        await this.onFilterChange({
+            target: {name: 'selectedUnits'},
+            value: null
+        }, this.state.unitField)
+
+        this.setState({checkLaunch: true})
     }
 
     render (){
@@ -89,10 +145,24 @@ class InventoryTable extends React.Component {
         const leftToolbarTemplate = () => {
             return (
                 <React.Fragment>
-                    <Button label="Confirmar" icon="pi pi-check" className="p-button-success"
-                            onClick={this.delete}
-                            disabled = {this.props.disableDeleteButton}
-                    />
+                    {
+                        this.state.checkLaunch ? (
+                            <>
+                            <Button label="Confirmar" icon="pi pi-check" className="p-button-success"
+                                onClick={this.confirmInvetoryLaunch}
+                            />
+                            <Button label="Voltar" icon="pi pi-undo" className="p-button-primary"
+                                style={{marginLeft: '8px'}}
+                                onClick={() => this.setState({checkLaunch: false})}
+                            />
+                            </>
+                        ) : (
+                            <Button label="Conferir Lançamento" icon="pi pi-eye" className="p-button-primary"
+                            onClick={this.checkLaunch}
+                            />
+                        )
+                    }
+                    
                 </React.Fragment>
             )
         }
@@ -100,14 +170,14 @@ class InventoryTable extends React.Component {
         const stockBody = (rowData) => {
             return (
                 <React.Fragment>
+                    <Button label={rowData.quantidade}
+                    className="p-button-rounded p-button-text p-button-secondary p-mr-2"
+                    style={ {marginLeft: '3px'} }
+                    />
                     {
-                        rowData.quantidade ? (
+                        this.props.updatedProductsList.some(element => element.id === rowData.id) ? (
                             <>
-                            <Button label={rowData.quantidade}
-                            className="p-button-rounded p-button-text p-button-secondary p-mr-2"
-                            style={ {marginLeft: '3px'} }
-                            />
-                            <Button title = "Cancelar estoque"
+                            <Button title = "Desfazer alteração"
                                 icon="pi pi-times"
                                 className="p-button-rounded p-button-danger p-mr-2"
                                 style={ {marginLeft: '3px'} }
@@ -126,6 +196,17 @@ class InventoryTable extends React.Component {
                     
                     
                 </React.Fragment>
+            );
+        }
+
+        const renderUndoUpdateStockConfirmationFooter = () => {
+            return (
+                <div>
+                    <Button label="Confirmar" icon="pi pi-check"
+                            onClick={this.confirmUndoUpdateStock} autoFocus />
+                    <Button label="Cancelar" icon="pi pi-times" onClick={() => this.setState({displayConfirmation: false})}
+                            className="p-button-text" />
+                </div>
             );
         }
 
@@ -157,7 +238,8 @@ class InventoryTable extends React.Component {
             <div className="card">
                 <Toolbar className="p-mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
-                <DataTable ref={this.dt} value={this.props.list}
+                <DataTable ref={this.dt}
+                            value={this.state.checkLaunch ? this.props.updatedProductsList : this.props.list}
                             className="p-datatable-sm"
                             rowHover
                             selection={this.state.selectedProducts}
@@ -174,23 +256,23 @@ class InventoryTable extends React.Component {
                     <Column selectionMode="multiple" headerStyle={{ width: '10px'}}></Column>
                     <Column field={this.state.codigoField} header="Código" sortable
                             style ={ {width: '18px'} }
-                            filter filterElement={codeFilterElement}
+                            filter={!this.state.checkLaunch} filterElement={codeFilterElement}
                             />
                     <Column field={this.state.descricaoField} header="Descrição" sortable style ={ {width: '55px'} }
-                            filter filterElement={descriptionFilterElement}
+                            filter={!this.state.checkLaunch} filterElement={descriptionFilterElement}
                             />
                     <Column field={this.state.NCMField} header="NCM" body={rowData => GeneralServices.adjustNCM(rowData.ncm)} sortable style ={ {width: '20px'} }
-                            filter filterElement={NCMFilterElement} 
+                            filter={!this.state.checkLaunch} filterElement={NCMFilterElement} 
                     />
 
                     <Column field={this.state.cfopField} header="CFOP" sortable style ={ {width: '20px'} }
-                            filter filterElement={cfopFilterElement} 
+                            filter={!this.state.checkLaunch} filterElement={cfopFilterElement} 
                     />
                     
                     <Column field="tipo" header="Tipo" sortable style ={ {width: '30px'} } />
 
                     <Column field={this.state.unitField} header="Unidade" sortable style ={ {width: '25px'} }
-                    filter filterElement={unitFilterElement} 
+                            filter={!this.state.checkLaunch} filterElement={unitFilterElement} 
                     />
                     <Column field="quantidade" header="Estoque" body={stockBody} sortable style ={ {width: '20px'} } />
 
@@ -207,17 +289,17 @@ class InventoryTable extends React.Component {
                             date={this.props.date}
                             hour={this.props.hour}
                 />
-                {/* <Dialog header="Desfazer Alteração"
-                        visible={this.state.displayConfirmation}
+                <Dialog header="Desfazer Alteração"
+                        visible={this.state.displayUndoUpdateStockConfirmation}
                         modal = {true} //congela restante da tela
-                        style={{ maxWidth: '350px' }}
-                        footer={renderDeleteConfirmationFooter()}
-                        onHide={() => this.setState({displayConfirmation: false})}>
+                        style={{ maxWidth: '400px' }}
+                        footer={renderUndoUpdateStockConfirmationFooter()}
+                        onHide={() => this.setState({displayUndoUpdateStockConfirmation: false})}>
                     <div className="confirmation-content row" style={{marginLeft: '10px'}}>
                         <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem', marginRight: '10px'}} />
                         <div style={{marginBottom: '10px'}}> Deseja desfazer a alteração de estoque? </div>
                     </div>
-                </Dialog> */}
+                </Dialog>
         </div>
         )
     }

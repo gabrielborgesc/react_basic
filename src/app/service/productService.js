@@ -50,6 +50,10 @@ class ProductService extends ApiService {
         return this.put(`/updateStock/${id}`, product)
     }
 
+    updateMutipleProductsStock(updatedProductsList){
+        return this.put(`/updateMutipleProductsStock`, updatedProductsList)
+    }
+
     getTypeList(){
         return [
             {label: 'Selecione...', value: ''},

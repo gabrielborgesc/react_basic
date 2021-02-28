@@ -126,6 +126,8 @@ class InvetoryLaunch extends React.Component {
             return
         }
         this.setState({selectionEnabled: true})
+        console.log('selection enabled', this.state.selectionEnabled)
+        console.log('list', this.state.filteredProductsList)
     }
 
     updateStockOnFilteredProducts = (product) => {

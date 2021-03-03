@@ -66,57 +66,39 @@ class GeneralServices extends React.Component {
         return 0;
     }
 
-    static compareTimestampByDecreasing(moviment1, moviment2){
-        const value1 = moviment1.timestamp
-        const value2 = moviment2.timestamp
-        if ( value1 > value2 ){
-            return -1;
-          }
-        else if ( value1 < value2){
-            return 1;
-          } else {
-                if(moviment1.id > moviment2.id){
-                return -1;
-                } 
-                else if(moviment1.id < moviment2.id){
-                return 1;
-                } else {
-                    return 0;
-            }
-        }
-    }
-
     static compareTimestampByIncreasing(moviment1, moviment2){
         const value1 = moviment1.timestamp
         const value2 = moviment2.timestamp
+        
         if ( value1 < value2 ){
             return -1;
         }
         else if ( value1 > value2){
             return 1;
-        } else {
-              if(moviment1.id < moviment2.id){
-                return -1;
-              } 
-              else if(moviment1.id > moviment2.id){
-                return 1;
-              } else {
-                    return 0;
-              }
-          }
+        }   else { //mesmo dia (mesmo timestamp)
+                const desempate1 = moviment1.desempate
+                const desempate2 = moviment2.desempate
+
+                if ( desempate1 < desempate2 ){
+                    return -1;
+                }
+                else if ( desempate1 > desempate2){
+                    return 1;
+                } else{
+                    console.log('algo de errado')
+                }
+            }
     }
 
-    static sortStockSheet(productStockSheet, increasing){
-        if(increasing === true){
-            productStockSheet.sort(this.compareTimestampByIncreasing)
-        } else{
-            productStockSheet.sort(this.compareTimestampByDecreasing)
-        }
+    static sortStockSheet(productStockSheet){
+
+        productStockSheet.sort(this.compareTimestampByIncreasing)
+
         return productStockSheet
     }
 
     static calculateBalance(productStockSheet){
-        productStockSheet = this.sortStockSheet(productStockSheet, true)
+        productStockSheet = this.sortStockSheet(productStockSheet)
         for(var i=0; i<productStockSheet.length; i++){
             var moviment = productStockSheet[i]
             if(moviment.tipoAtualizacao !== 'MANUAL'){
@@ -124,7 +106,8 @@ class GeneralServices extends React.Component {
                 moviment.saldo = previousMoviment.saldo + moviment.entrada - moviment.saida
             }
         }
-        return this.sortStockSheet(productStockSheet, false)
+        // return this.sortStockSheet(productStockSheet, false)
+        return productStockSheet.reverse()
     }
 
     static adjustNCM = (ncm) => {

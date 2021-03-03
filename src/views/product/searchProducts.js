@@ -74,6 +74,11 @@ class SearchProduct extends React.Component {
         this.productService.search(productFilter)
         .then(response => {
             var productList = response.data
+            // productList.forEach(product => {
+            //     if(product.codigo === '149'){
+            //         console.log(product.stockSheet)
+            //     }
+            // })
             this.setState({productList})
             this.setState({filteredProductList: productList})
             this.filter()

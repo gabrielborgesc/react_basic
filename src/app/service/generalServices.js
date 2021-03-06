@@ -103,7 +103,9 @@ class GeneralServices extends React.Component {
             var moviment = productStockSheet[i]
             if(moviment.tipoAtualizacao !== 'MANUAL'){
                 var previousMoviment = productStockSheet[i-1]
-                moviment.saldo = previousMoviment.saldo + moviment.entrada - moviment.saida
+                if(previousMoviment && previousMoviment.saldo){
+                    moviment.saldo = previousMoviment.saldo + moviment.entrada - moviment.saida
+                }
             }
         }
         // return this.sortStockSheet(productStockSheet, false)

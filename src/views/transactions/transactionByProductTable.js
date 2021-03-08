@@ -248,6 +248,7 @@ class TransactionByProductTable extends React.Component {
                     filter filterElement={cfopFilterElement} />
 
                     <Column field = "valor" header="Valor Total" body={transaction => GeneralServices.valueBodyTemplate(transaction.valor)} sortable style ={ {width: '140px'} }></Column>
+                    
                     <Column field={this.state.dateView} header="Data de Emissão" body={rowData => rowData.dhEmi.substring(0, 21)} sortable style ={ {width: '140px'} }></Column>
                     
                     <Column field={this.state.numberField} header="Número" sortable style ={ {width: '140px'} } 

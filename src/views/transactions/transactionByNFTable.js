@@ -42,7 +42,8 @@ class TransactionByNFTable extends React.Component {
         selectedModels: null,
         unitField: 'productInfo.unidadeComercializada',
         selectedUnits: null,
-        expandedRows: []
+        expandedRows: [],
+        current: null
     }
     constructor(){
         super()
@@ -117,10 +118,23 @@ class TransactionByNFTable extends React.Component {
         this.props.deleteMultiple(listOfNFNumbers)
     }
 
-    onFilterChange = (event, filterField) => {
+    onFilterChange = async (event, filterField) => {
+        if(this.state.expandedRows && this.state.expandedRows.length!==0){
+            await this.setState({expandedRows: []})
+        }
         const name = event.target.name
         this.dt.current.filter(event.value, filterField, 'in');
         this.setState({[name]: event.value})
+    }
+
+    handleRowToggle = (e) => {
+        this.setState({expandedRows: e.data})
+        if(!this.state.current) {
+            this.setState({current: this.dt.current})
+        }
+        if(!this.dt.current) {
+            this.dt.current = this.state.current
+        }
     }
 
     render (){
@@ -265,7 +279,7 @@ class TransactionByNFTable extends React.Component {
                             loading={this.props.loading}
                             expandableRows={true}
                             expandedRows = {this.state.expandedRows}
-                            onRowToggle={(e) => this.setState({expandedRows: e.data})}
+                            onRowToggle={this.handleRowToggle}
                             rowExpansionTemplate={rowExpansionTemplate}
                     dataKey="numero" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"

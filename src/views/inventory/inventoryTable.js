@@ -3,8 +3,8 @@ import { Toast } from 'primereact/toast'
 import { Button } from 'primereact/button'
 import { Toolbar } from 'primereact/toolbar'
 import { DataTable } from 'primereact/datatable'
-import { Column } from 'primereact/column'
 import { Dialog } from 'primereact/dialog'
+import { Column } from 'primereact/column'
 
 import currecyFormater from 'currency-formatter'
 import * as popUp from '../../components/toastr'
@@ -41,7 +41,8 @@ class InventoryTable extends React.Component {
         selectedUnits: null,
         updateStockDialog: false,
         productToUpdateId: null,
-        checkLaunch: false
+        checkLaunch: false,
+        loading: false
     }
     constructor(){
         super()
@@ -91,6 +92,7 @@ class InventoryTable extends React.Component {
     }
 
     confirmInvetoryLaunch = () => {
+        this.setState({loading: true})
         this.productService.updateMutipleProductsStock({
             productsList: this.props.updatedProductsList
         })
@@ -99,12 +101,18 @@ class InventoryTable extends React.Component {
             this.props.search()
             this.setState({checkLaunch: false})
             this.props.resetUpdatedProductsList()
+            this.setState({loading: false})
         }).catch(error => {
             HandleErrorService.handleError(this.props.push, error)
+            this.setState({loading: false})
         })
     }
 
     checkLaunch = async () => {
+        if(!this.props.updatedProductsList || this.props.updatedProductsList.length === 0){
+            popUp.infoPopUp('Nenhuma alteração foi realizada')
+            return
+        }
         await this.onFilterChange({
             target: {name: 'selectedCodes'},
             value: null
@@ -247,7 +255,7 @@ class InventoryTable extends React.Component {
                             scrollable
                             scrollHeight="500px"
                             // rowHover
-                            loading={this.props.loading}
+                            loading={this.props.loading || this.state.loading}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"

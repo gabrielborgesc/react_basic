@@ -40,6 +40,8 @@ class ProductCrudTable extends React.Component {
         selectedCfops: null,
         unitField: 'unidadeComercializada',
         selectedUnits: null,
+        expandedRows: [],
+        current: null
     }
     constructor(){
         super()
@@ -122,10 +124,27 @@ class ProductCrudTable extends React.Component {
         this.props.deleteMultiple(listOfId)
     }
 
-    onFilterChange = (event, filterField) => {
+    onFilterChange = async (event, filterField) => {
+        if(this.state.expandedRows && this.state.expandedRows.length!==0){
+            await this.setState({expandedRows: []})
+        }
         const name = event.target.name
-        this.dt.current.filter(event.value, filterField, 'in');
+        if(this.dt.current) {
+            this.dt.current.filter(event.value, filterField, 'in');
+        } else{
+            this.state.current.filter(event.value, filterField, 'in');
+        }
         this.setState({[name]: event.value})
+    }
+
+    handleRowToggle = (e) => {
+        this.setState({expandedRows: e.data})
+        if(!this.state.current) {
+            this.setState({current: this.dt.current})
+        }
+        if(!this.dt.current) {
+            this.dt.current = this.state.current
+        }
     }
 
     render (){
@@ -135,7 +154,8 @@ class ProductCrudTable extends React.Component {
                 <React.Fragment>
                     <Button label="Deletar" icon="pi pi-trash" className="p-button-danger"
                             onClick={this.delete}
-                            disabled = {this.props.disableDeleteButton}
+                            disabled = {this.props.disableDeleteButton || !this.state.selectedProducts
+                                        || this.state.selectedProducts.length === 0}
                             />
                 </React.Fragment>
             )
@@ -199,6 +219,42 @@ class ProductCrudTable extends React.Component {
         const unitFilterElement = this.tableFilters.renderUnitFilter(this.state.selectedUnits, this.productService.getUnitList, this.props.list,
             "selectedUnits", this.onFilterChange, this.state.unitField)        
 
+
+            const rowExpansionTemplate = product => {
+                return(
+                    <div className="orders-subtable">
+                    <h5>Ficha de estoque de {product.descricao}</h5>
+                    <DataTable ref={this.dt} value={GeneralServices.calculateBalance(product.stockSheet)}
+                                className="p-datatable-sm"
+                                rowHover
+                                scrollable
+                                scrollHeight="300px"
+                        dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Mostrando de {first} ao {last} de {totalRecords} movimentações"
+                        >
+    
+                        <Column field="timestamp" header="Data" body={rowData => rowData.data} sortable style ={ {width: '140px'} }
+                        // filter filterElement={codeFilterElement}
+                         />
+    
+                        <Column field="entrada" header="Entrada" sortable style ={ {width: '140px'} }
+                        />
+    
+                        <Column field="saida" header="Saída" sortable style ={ {width: '140px'} }
+                        />
+    
+                        <Column field="saldo" header="Saldo" sortable style ={ {width: '140px'} }
+                        />
+                        <Column field="tipoAtualizacao" header="Tipo de Atualização" sortable style ={ {width: '140px'} } 
+                        // filter filterElement={cfopFilterElement}
+                         />
+                        {/* <Column body={actionBodyTemplate} style ={ {width: '160px'} }></Column> */}
+                    </DataTable>
+                    </div>
+                )
+            }
+
         return (
             <div className="datatable-crud-demo">
             <Toast ref={this.toast} />
@@ -215,12 +271,19 @@ class ProductCrudTable extends React.Component {
                             scrollHeight="500px"
                             // rowHover
                             loading={this.props.loading}
+                            expandableRows={true}
+                            expandedRows = {this.state.expandedRows}
+                            onRowToggle={this.handleRowToggle}
+                            rowExpansionTemplate={rowExpansionTemplate}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                     >
 
-                    <Column selectionMode="multiple" headerStyle={{ width: '10px'}}></Column>
+                    <Column selectionMode="multiple" headerStyle={{ width: '10px'}} />
+
+                    <Column expander style={{ width: '0.5em' }} />
+
                     <Column field={this.state.codigoField} header="Código" sortable
                             style ={ {width: '18px'} }
                             filter filterElement={codeFilterElement}

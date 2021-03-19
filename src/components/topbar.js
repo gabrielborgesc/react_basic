@@ -7,7 +7,7 @@ class Topbar extends React.Component {
 
     render () {
         const items = [
-            {label: 'Home', icon: 'pi pi-fw pi-home', command: () => {window.location="#/Home"}},
+            {label: 'Home', icon: 'pi pi-fw pi-home', command: () => {window.location="#/home"}},
             // {label: 'Usuários', icon: 'pi pi-user', command: () => {window.location="#/signUp"}},
             this.context.isAuth ? 
             {label: "Módulos", icon: 'pi pi-list',

@@ -23,9 +23,7 @@ class App extends React.Component {
       <div className = "body-color" >
       <AuthenticationProvider>
       <Topbar />
-      {/* <div className = "container"> */}
         <Routes />
-      {/* </div> */}
       </AuthenticationProvider>
       </div>
     );
